@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, Shield, Zap, ArrowRight, Activity, ChevronRight } from 'lucide-react';
+import { TrendingUp, Shield, Zap, ArrowRight, Activity } from 'lucide-react';
 
 const LandingPage = () => {
   const containerVariants = {

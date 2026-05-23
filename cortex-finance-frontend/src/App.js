@@ -10,9 +10,9 @@ import {
 
 /* Pages */
 
-import Landing from "./pages/Landing";
+import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
-import Sign from "./pages/Sign";
+import Signup from "./pages/Signup";
 import Upload from "./pages/Upload";
 import Processing from "./pages/Processing";
 import Dashboard from "./pages/Dashboard";
@@ -21,22 +21,6 @@ import Chatbot from "./pages/Chatbot";
 /* CSS */
 
 import "./App.css";
-
-const AnimatedRoutes = () => {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/dashboard/*" element={<Dashboard />} />
-      </Routes>
-    </AnimatePresence>
-  );
-};
 
 function App() {
 
@@ -49,7 +33,7 @@ function App() {
         {/* Landing Page */}
         <Route
           path="/"
-          element={<Landing />}
+          element={<LandingPage />}
         />
 
         {/* Login Page */}
@@ -61,7 +45,7 @@ function App() {
         {/* Signup Page */}
         <Route
           path="/signup"
-          element={<Sign />}
+          element={<Signup />}
         />
 
         {/* Upload Page */}
@@ -78,7 +62,7 @@ function App() {
 
         {/* Dashboard Page */}
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={<Dashboard />}
         />
 

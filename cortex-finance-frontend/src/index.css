@@ -36,7 +36,7 @@
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-accentCyan to-accentPurple text-white shadow-[0_0_20px_rgba(0, 240, 255, 0.3)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0, 240, 255, 0.6)] hover:brightness-110;
+    @apply bg-gradient-to-r from-accentCyan to-accentPurple text-white shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] hover:brightness-110;
   }
 
   .btn-secondary {

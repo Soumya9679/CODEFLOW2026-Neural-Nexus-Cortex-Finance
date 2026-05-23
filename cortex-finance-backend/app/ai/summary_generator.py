@@ -1,6 +1,7 @@
 import os
 import google.generativeai as genai
 from app.ai.gemini_classifier import api_key
+from app.utils.ollama_client import is_ollama_available, get_ollama_llm
 
 # Configure Gemini if key is available
 if api_key:
@@ -10,7 +11,7 @@ def generate_financial_summary(analytics_data: dict) -> str:
     """
     Generates a high-level narrative summary of the user's financial profile.
     
-    If Gemini API key is missing or calls fail, uses a structured rules-based fallback.
+    Prioritizes local Ollama (qwen2.5:1.5b); falls back to Gemini or rules-based summary.
     """
     income = analytics_data.get("income", 0.0)
     expense = analytics_data.get("expense", 0.0)
@@ -49,11 +50,38 @@ def generate_financial_summary(analytics_data: dict) -> str:
         summary_text += f"Overall, your financial health score is rated at {score}/100."
         return summary_text
 
-    # 2. Check if Gemini API is configured
+    # 2. Try Local Ollama (qwen2.5:1.5b)
+    if is_ollama_available():
+        print("INFO: Local Ollama (qwen2.5:1.5b) is running. Using Ollama for financial summary.")
+        try:
+            llm = get_ollama_llm()
+            prompt = f"""You are an expert financial analyst. Summarize this user's bank statement metrics into a single, cohesive, professional narrative paragraph (3-4 sentences max).
+
+Financial Metrics:
+- Total Income: {income} INR
+- Total Expense: {expense} INR
+- Net Savings: {savings} INR (Savings Rate: {savings_rate}%)
+- Health Score: {score}/100
+- Category Spend Breakdown: {categories}
+- Anomalies Count: {len(anomalies)}
+- Recurring Subscriptions Count: {len(recurring)}
+
+Instructions:
+- Write a professional, high-quality narrative paragraph.
+- Address the general cash flow, top spending category, and overall health score rating.
+- Do not use any introductory tags (like "Here is the summary:") or bullet points. Just return the raw paragraph.
+"""
+            response = llm.invoke(prompt)
+            return response.strip()
+        except Exception as e:
+            print(f"Error using local Ollama for summary: {e}. Falling back to Gemini.")
+
+    # 3. Try Gemini API
     if not api_key:
         return get_rules_based_summary()
 
     try:
+        print("INFO: Local Ollama not available or failed. Falling back to Gemini for summary.")
         prompt = f"""
 You are an expert financial analyst. Summarize this user's bank statement metrics into a single, cohesive, professional narrative paragraph (3-4 sentences max).
 

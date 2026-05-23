@@ -1,6 +1,7 @@
 import os
 import google.generativeai as genai
 from app.ai.gemini_classifier import api_key
+from app.utils.ollama_client import is_ollama_available, get_ollama_llm
 
 # Configure Gemini if key is available
 if api_key:
@@ -11,7 +12,7 @@ def generate_financial_insights(analytics_data: dict) -> list[str]:
     Generates actionable financial insights and budgeting advice based on 
     dashboard analytics.
     
-    If Gemini API key is missing or calls fail, uses a rules-based fallback engine.
+    Prioritizes local Ollama (qwen2.5:1.5b); falls back to Gemini or rules-based engine.
     """
     # 1. Rules-based Fallback Generator
     def get_rules_based_insights():
@@ -62,11 +63,43 @@ def generate_financial_insights(analytics_data: dict) -> list[str]:
             
         return insights
 
-    # 2. Check if Gemini API is configured
+    # 2. Try Local Ollama (qwen2.5:1.5b)
+    if is_ollama_available():
+        print("INFO: Local Ollama (qwen2.5:1.5b) is running. Using Ollama for financial insights.")
+        try:
+            llm = get_ollama_llm()
+            prompt = f"""You are an expert financial advisor. Analyze the following financial analytics data and generate exactly 4 actionable, highly personalized financial insights, savings suggestions, or budgeting tips for the user.
+
+Financial Data:
+- Total Income: {analytics_data.get("income")} INR
+- Total Expenses: {analytics_data.get("expense")} INR
+- Net Savings: {analytics_data.get("savings")} INR
+- Savings Rate: {analytics_data.get("savings_rate")}%
+- Financial Health Score: {analytics_data.get("score")}/100
+- Spending by Category: {analytics_data.get("categories")}
+- Top Merchant Spending: {analytics_data.get("merchant_rankings")}
+- Outlier Anomalies: {analytics_data.get("anomalies")}
+- Recurring Subscriptions/EMIs: {analytics_data.get("recurring_payments")}
+
+Instructions:
+- Provide exactly 4 bulleted insights.
+- Keep each insight brief, encouraging, and direct (max 2 sentences per bullet point).
+- Emphasize specific issues like high discretionary spending, recurring charges, low savings rate, or anomalous transactions if present.
+- Do not return any conversational intro or outro text, only return the list of bullet points starting with standard icons (like 💰, ⚠️, 🔴, 🟢, 🛍️, 🔄).
+"""
+            response = llm.invoke(prompt)
+            lines = [line.strip().lstrip("-* ").strip() for line in response.strip().split("\n") if line.strip()]
+            if len(lines) >= 2:
+                return lines
+        except Exception as e:
+            print(f"Error using local Ollama for insights: {e}. Falling back to Gemini.")
+
+    # 3. Try Gemini API
     if not api_key:
         return get_rules_based_insights()
 
     try:
+        print("INFO: Local Ollama not available or failed. Falling back to Gemini for insights.")
         prompt = f"""
 You are an expert financial advisor and planner. 
 Analyze the following financial analytics data and generate a list of exactly 4 actionable, highly personalized financial insights, savings suggestions, or budgeting tips for the user.
@@ -91,9 +124,7 @@ Instructions:
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt)
         
-        # Parse output into clean lines
         lines = [line.strip().lstrip("-* ").strip() for line in response.text.strip().split("\n") if line.strip()]
-        # Fall back to rules-based if output formatting is wrong
         return lines if len(lines) >= 2 else get_rules_based_insights()
         
     except Exception as e:

@@ -1,23 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, Wallet, TrendingUp, AlertTriangle, Repeat, Zap, Loader2, Download, ArrowRight } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Chatbot from './Chatbot';
+import Settings from './Settings';
 import api from '../api/mockService';
 
 const COLORS = ['#00f0ff', '#b026ff', '#00ff88', '#ff5f56', '#facc15'];
 
-<<<<<<< HEAD
-import Navbar from "../components/Navbar";
-import Welcome from "../components/Welcome";
-import SummaryCard from "../components/SummaryCard";
-import TransactionTable from "../components/TransactionTable";
-import Charts from "../components/Charts";
-
-import "../App.css";
-=======
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
@@ -29,7 +21,6 @@ const CustomTooltip = ({ active, payload }) => {
   }
   return null;
 };
->>>>>>> e3cbdee70533f79d6df8243a38ac095ca817d7eb
 
 const DashboardOverview = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -96,77 +87,6 @@ const DashboardOverview = () => {
   }
 
   return (
-<<<<<<< HEAD
-
-    <div className="dashboard-container">
-
-      {/* Navbar */}
-
-      <Navbar />
-
-      {/* Welcome Section */}
-
-      <Welcome />
-
-      {/* Summary Cards */}
-
-      <div className="card-grid">
-
-        <SummaryCard
-          title="Total Income"
-          amount="₹50,000"
-        />
-
-        <SummaryCard
-          title="Total Expense"
-          amount="₹35,000"
-        />
-
-        <SummaryCard
-          title="Savings"
-          amount="₹15,000"
-        />
-
-        <SummaryCard
-          title="Financial Score"
-          amount="85%"
-        />
-
-      </div>
-
-      {/* Charts */}
-
-      <Charts />
-
-      {/* Transactions */}
-
-      <TransactionTable />
-
-      {/* AI Insights */}
-
-      <div className="insight-section">
-
-        <h2>AI Insights 🤖</h2>
-
-        <div className="insight-card">
-          You spent 20% more on food this month.
-        </div>
-
-        <div className="insight-card">
-          Your highest expense category is Shopping.
-        </div>
-
-        <div className="insight-card">
-          You can save ₹5,000 by reducing weekend spending.
-        </div>
-
-        {/* Open Chatbot Button */}
-
-        <Link to="/chatbot">
-
-          <button className="chatbot-open-btn">
-            Open AI Assistant 🤖
-=======
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -186,7 +106,6 @@ const DashboardOverview = () => {
           <button onClick={exportToCSV} className="btn bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-colors py-2 px-4 rounded-xl text-sm flex items-center gap-2">
             <Download size={16} />
             Export
->>>>>>> e3cbdee70533f79d6df8243a38ac095ca817d7eb
           </button>
         </div>
       </header>
@@ -298,7 +217,7 @@ const DashboardOverview = () => {
                   ))}
                 </defs>
                 <Pie
-                  data={dashboardData?.categoryBreakdown}
+                  data={dashboardData?.categoryBreakdown || []}
                   cx="50%"
                   cy="50%"
                   innerRadius={65}
@@ -308,7 +227,7 @@ const DashboardOverview = () => {
                   stroke="none"
                   cornerRadius={4}
                 >
-                  {dashboardData?.categoryBreakdown.map((entry, index) => (
+                  {(dashboardData?.categoryBreakdown || []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={`url(#grad-${index % COLORS.length})`} />
                   ))}
                 </Pie>
@@ -316,7 +235,7 @@ const DashboardOverview = () => {
               </PieChart>
             </ResponsiveContainer>
             <div className="w-full mt-6 space-y-3">
-              {dashboardData?.categoryBreakdown.map((entry, index) => (
+              {(dashboardData?.categoryBreakdown || []).map((entry, index) => (
                 <div key={entry.name} className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full" style={{ background: COLORS[index % COLORS.length] }}></span>
@@ -374,6 +293,7 @@ const Dashboard = () => {
       <Routes>
         <Route path="/" element={<DashboardOverview />} />
         <Route path="/chat" element={<Chatbot />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </div>
   );
