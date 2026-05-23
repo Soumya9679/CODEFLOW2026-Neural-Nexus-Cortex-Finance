@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Server, Wifi, WifiOff, Database, Trash2, CheckCircle2, RefreshCw } from 'lucide-react';
 
 const Settings = () => {
-  const [apiMode, setApiMode] = useState(localStorage.getItem('cortex_api_mode') || 'mock');
+  const [apiMode, setApiMode] = useState(localStorage.getItem('cortex_api_mode') || 'live');
   const [backendStatus, setBackendStatus] = useState('checking');
   const [statusMessage, setStatusMessage] = useState('');
   const [isClearing, setIsClearing] = useState(false);

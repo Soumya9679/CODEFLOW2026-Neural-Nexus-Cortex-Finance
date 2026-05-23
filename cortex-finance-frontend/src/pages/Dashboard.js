@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, Wallet, TrendingUp, AlertTriangle, Repeat, Zap, Loader2, Download, ArrowRight } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Chatbot from './Chatbot';
@@ -141,9 +141,17 @@ const DashboardOverview = () => {
             <span className="text-textSecondary font-medium">Financial Health</span>
             <div className="p-2 rounded-lg bg-accentCyan/20 text-accentCyan"><Zap size={20} /></div>
           </div>
-          <div className="text-3xl font-bold text-gradient mb-2">{dashboardData?.healthStatus}</div>
+          <div className="text-3xl font-bold text-gradient mb-2">
+            {dashboardData?.healthStatus} <span className="text-lg font-semibold text-textSecondary">({dashboardData?.score || 50}/100)</span>
+          </div>
           <div className="flex items-center gap-1 text-accentCyan text-sm font-medium">
             <span>Savings rate: {dashboardData?.savingsRate}%</span>
+          </div>
+          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+            <div 
+              className="bg-gradient-to-r from-accentCyan to-accentPurple h-1.5 rounded-full" 
+              style={{ width: `${dashboardData?.score || 50}%` }}
+            ></div>
           </div>
         </motion.div>
       </div>
@@ -153,6 +161,21 @@ const DashboardOverview = () => {
         <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
           <Zap size={20} className="text-accentCyan" /> AI Insights & Recommendations
         </h3>
+
+        {insights?.aiInsightsList && insights.aiInsightsList.length > 0 && (
+          <div className="mb-6 p-4 rounded-xl bg-slate-900/50 border border-glassBorder">
+            <h4 className="font-semibold text-accentCyan text-sm mb-3 uppercase tracking-wider">Cortex AI Recommendations</h4>
+            <ul className="space-y-2">
+              {insights.aiInsightsList.map((recommendation, idx) => (
+                <li key={idx} className="flex items-start gap-2.5 text-sm text-textSecondary">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accentCyan mt-2 shrink-0"></span>
+                  <span className="text-white/90">{recommendation}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-5 flex flex-col gap-3">
             <div className="flex gap-4 items-start">
@@ -205,45 +228,56 @@ const DashboardOverview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="glass-panel p-6 lg:col-span-1 flex flex-col">
           <h3 className="text-xl font-bold mb-6">Expense Breakdown</h3>
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <defs>
-                  {COLORS.map((color, index) => (
-                    <linearGradient key={`grad-${index}`} id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={color} stopOpacity={1} />
-                      <stop offset="95%" stopColor={color} stopOpacity={0.6} />
-                    </linearGradient>
-                  ))}
-                </defs>
-                <Pie
-                  data={dashboardData?.categoryBreakdown || []}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={65}
-                  outerRadius={85}
-                  paddingAngle={8}
-                  dataKey="value"
-                  stroke="none"
-                  cornerRadius={4}
-                >
-                  {(dashboardData?.categoryBreakdown || []).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={`url(#grad-${index % COLORS.length})`} />
-                  ))}
-                </Pie>
-                <RechartsTooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="w-full mt-6 space-y-3">
-              {(dashboardData?.categoryBreakdown || []).map((entry, index) => (
-                <div key={entry.name} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full" style={{ background: COLORS[index % COLORS.length] }}></span>
-                    <span className="text-textSecondary">{entry.name}</span>
-                  </div>
-                  <span className="font-medium text-white">{entry.value}%</span>
-                </div>
-              ))}
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[220px]">
+            <div className="relative w-full h-[220px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <defs>
+                    {COLORS.map((color, index) => (
+                      <linearGradient key={`grad-${index}`} id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={color} stopOpacity={1} />
+                        <stop offset="95%" stopColor={color} stopOpacity={0.6} />
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <Pie
+                    data={dashboardData?.categoryBreakdown || []}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={85}
+                    paddingAngle={8}
+                    dataKey="value"
+                    stroke="none"
+                    cornerRadius={4}
+                  >
+                    {(dashboardData?.categoryBreakdown || []).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={`url(#grad-${index % COLORS.length})`} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-3 overflow-y-auto max-h-[140px] pr-1">
+              {(() => {
+                const total = (dashboardData?.categoryBreakdown || []).reduce((sum, item) => sum + item.value, 0);
+                return (dashboardData?.categoryBreakdown || []).map((entry, index) => {
+                  const percentage = total > 0 ? ((entry.value / total) * 100).toFixed(1) : 0;
+                  return (
+                    <div key={entry.name} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: COLORS[index % COLORS.length] }}></span>
+                        <span className="text-textSecondary truncate max-w-[90px]">{entry.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 font-semibold">
+                        <span className="text-textSecondary text-xs">₹{entry.value.toLocaleString('en-IN')}</span>
+                        <span className="text-white text-xs">{percentage}%</span>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
@@ -279,6 +313,58 @@ const DashboardOverview = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Trend and Top Merchants row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+        <div className="glass-panel p-6 lg:col-span-2">
+          <h3 className="text-xl font-bold mb-6">Income vs Expense Trend</h3>
+          <div className="w-full overflow-x-auto">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={dashboardData?.monthlyTrend || []}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" />
+                <YAxis stroke="rgba(255,255,255,0.5)" />
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    borderColor: 'rgba(0, 240, 255, 0.3)',
+                    borderRadius: '12px',
+                    color: '#fff'
+                  }}
+                />
+                <Legend wrapperStyle={{ color: '#fff' }} />
+                <Bar dataKey="income" name="Income" fill="#00ff88" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="expense" name="Expense" fill="#ff5f56" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="glass-panel p-6 lg:col-span-1">
+          <h3 className="text-xl font-bold mb-6">Top Merchant Spending</h3>
+          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+            {(dashboardData?.merchantRankings || []).map((m, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-glassBorder">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold">
+                    {idx + 1}
+                  </span>
+                  <span className="font-semibold text-white truncate max-w-[150px]">{m.merchant}</span>
+                </div>
+                <span className="font-bold text-accentPurple">₹{m.amount.toLocaleString('en-IN')}</span>
+              </div>
+            ))}
+            {(!dashboardData?.merchantRankings || dashboardData.merchantRankings.length === 0) && (
+              <div className="text-center text-textSecondary py-8 text-sm">
+                No merchant spending data available
+              </div>
+            )}
           </div>
         </div>
       </div>

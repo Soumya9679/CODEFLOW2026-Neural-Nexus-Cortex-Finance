@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 
 // Create the axios instance
 export const api = axios.create({
-  timeout: 10000,
+  timeout: 120000,
 });
 
 // Setup mock adapter
@@ -15,11 +15,26 @@ const mockDashboardData = {
   totalExpenses: 24532,
   healthStatus: "Good",
   savingsRate: 35,
+  score: 75.0,
   categoryBreakdown: [
-    { name: 'Food', value: 35 },
-    { name: 'Rent', value: 40 },
-    { name: 'Travel', value: 10 },
-    { name: 'Shopping', value: 15 },
+    { name: 'Food', value: 3500 },
+    { name: 'Rent', value: 15000 },
+    { name: 'Travel', value: 2000 },
+    { name: 'Shopping', value: 4032 },
+  ],
+  merchantRankings: [
+    { merchant: "Swiggy", amount: 2500 },
+    { merchant: "Amazon Pay", amount: 3200 },
+    { merchant: "Rent Transfer", amount: 15000 },
+    { merchant: "Zomato", amount: 1000 },
+    { merchant: "Uber", amount: 2000 }
+  ],
+  monthlyTrend: [
+    { month: 'Jan', income: 75000, expense: 22000 },
+    { month: 'Feb', income: 78000, expense: 25000 },
+    { month: 'Mar', income: 80000, expense: 23000 },
+    { month: 'Apr', income: 82000, expense: 27000 },
+    { month: 'May', income: 85000, expense: 24532 }
   ]
 };
 
@@ -46,7 +61,12 @@ const mockInsightsData = {
     { service: "Spotify", amount: 119 },
     { service: "Amazon Prime", amount: 299 }
   ],
-  totalRecurring: 1067
+  totalRecurring: 1067,
+  aiInsightsList: [
+    "Your savings rate is looking solid at 35%. Try automating 10% more into investments.",
+    "Dining and Swiggy constitute a notable portion of weekend card usage.",
+    "Consider review of active monthly subscriptions to minimize digital leakage."
+  ]
 };
 
 // Setup Mock Endpoints
@@ -86,8 +106,15 @@ const adaptDashboardData = (raw) => {
     totalIncome: raw.income || 0,
     totalExpenses: raw.expense || 0,
     savingsRate: raw.savings_rate || 0,
+    score: raw.score || 50.0,
     healthStatus: (raw.score >= 80) ? "Excellent" : (raw.score >= 60) ? "Good" : "Needs Attention",
-    categoryBreakdown: Object.entries(raw.categories || {}).map(([name, value]) => ({ name, value }))
+    categoryBreakdown: Object.entries(raw.categories || {}).map(([name, value]) => ({ name, value })),
+    merchantRankings: raw.merchant_rankings || [],
+    monthlyTrend: Object.entries(raw.monthly_trend || {}).map(([month, data]) => ({
+      month: month,
+      income: data.income,
+      expense: data.expense
+    }))
   };
 };
 
@@ -109,10 +136,9 @@ const adaptTransactionsData = (rawTxs) => {
   });
 };
 
-const adaptInsightsData = (rawDash) => {
-  if (!rawDash) return mockInsightsData;
-  const anomalies = rawDash.anomalies || [];
-  const recurring = rawDash.recurring_payments || [];
+const adaptInsightsData = (rawDash, rawInsightsResponse) => {
+  const anomalies = rawDash?.anomalies || [];
+  const recurring = rawDash?.recurring_payments || [];
   
   const recurringFormatted = recurring.map(item => ({
     service: item.narration || item.service || 'Subscription',
@@ -131,6 +157,8 @@ const adaptInsightsData = (rawDash) => {
     ? `We detected ${anomalies.length} anomalous transactions that significantly exceed your normal spending habits.`
     : "No unusual spending or anomalous transactions detected in this statement.";
 
+  const aiInsightsList = rawInsightsResponse?.insights || mockInsightsData.aiInsightsList;
+
   return {
     overspending: {
       category: anomalies.length > 0 ? (anomalies[0].category || "Dining") : "Dining",
@@ -139,13 +167,14 @@ const adaptInsightsData = (rawDash) => {
       items: anomalyItems
     },
     recurring: recurringFormatted,
-    totalRecurring: totalRecurring
+    totalRecurring: totalRecurring,
+    aiInsightsList: aiInsightsList
   };
 };
 
 // Dynamic Mode Configuration
 export const configureApi = () => {
-  const mode = localStorage.getItem('cortex_api_mode') || 'mock';
+  const mode = localStorage.getItem('cortex_api_mode') || 'live';
   
   if (mode === 'live') {
     api.defaults.baseURL = 'http://localhost:8000';
@@ -159,7 +188,7 @@ export const configureApi = () => {
 // Intercept requests to adapt responses in live mode
 api.interceptors.response.use(
   (response) => {
-    const mode = localStorage.getItem('cortex_api_mode') || 'mock';
+    const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
       const url = response.config.url.replace(response.config.baseURL, '').split('?')[0];
       
@@ -170,7 +199,7 @@ api.interceptors.response.use(
         response.data = { transactions: adaptTransactionsData(response.data.transactions) };
       } else if (url === '/insights') {
         const rawDashboard = window.__lastRawDashboard; 
-        response.data = adaptInsightsData(rawDashboard);
+        response.data = adaptInsightsData(rawDashboard, response.data);
       } else if (url === '/chat') {
         response.data = { reply: response.data.response || response.data.reply };
       }
@@ -178,7 +207,7 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const mode = localStorage.getItem('cortex_api_mode') || 'mock';
+    const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
       console.warn("FastAPI backend request failed, falling back to mock:", error.message);
       const url = error.config.url.replace(error.config.baseURL, '').split('?')[0];
@@ -200,7 +229,7 @@ api.interceptors.response.use(
 // Intercept request in live mode to adapt chat payload structure
 api.interceptors.request.use(
   (config) => {
-    const mode = localStorage.getItem('cortex_api_mode') || 'mock';
+    const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
       const url = config.url.replace(config.baseURL, '').split('?')[0];
       if (url === '/chat' && config.data) {

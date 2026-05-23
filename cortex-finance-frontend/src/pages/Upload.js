@@ -36,7 +36,7 @@ const Upload = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      await api.post('/upload', formData);
+      await api.post('/upload', formData, { timeout: 120000 });
       navigate('/dashboard');
     } catch (err) {
       setError('Upload failed. Please try again.');
