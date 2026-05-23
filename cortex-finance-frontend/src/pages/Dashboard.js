@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, Wallet, TrendingUp, AlertTriangle, Repeat, Zap, Loader2, Download, ArrowRight } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
+import Sidebar from './Sidebar';
 import Chatbot from './Chatbot';
 import Settings from './Settings';
 import api from '../api/mockService';
@@ -36,7 +36,7 @@ const DashboardOverview = () => {
           api.get('/transactions'),
           api.get('/insights')
         ]);
-        
+
         setDashboardData(dashRes.data);
         setTransactions(txRes.data.transactions);
         setInsights(insRes.data);
@@ -54,16 +54,16 @@ const DashboardOverview = () => {
     if (!transactions.length) return;
     const headers = ['Date', 'Category', 'Description', 'Amount', 'Type', 'Status'];
     const csvRows = [headers.join(',')];
-    
+
     transactions.forEach(tx => {
       const row = [`"${tx.date}"`, `"${tx.category}"`, `"${tx.asset}"`, `"${tx.value}"`, `"${tx.type}"`, `"${tx.status}"`];
       csvRows.push(row.join(','));
     });
-    
+
     const csvString = csvRows.join('\n');
     const blob = new Blob([csvString], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    
+
     const a = document.createElement('a');
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
@@ -87,7 +87,7 @@ const DashboardOverview = () => {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -109,7 +109,7 @@ const DashboardOverview = () => {
           </button>
         </div>
       </header>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 ai-glow relative group overflow-hidden">
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-accentGreen/20 rounded-full blur-2xl group-hover:bg-accentGreen/40 transition-all"></div>
@@ -119,10 +119,10 @@ const DashboardOverview = () => {
           </div>
           <div className="text-3xl font-bold text-white mb-2">₹{dashboardData?.totalIncome.toLocaleString()}</div>
           <div className="flex items-center gap-1 text-accentGreen text-sm font-medium">
-             <span>Primary Source: Salary</span>
+            <span>Primary Source: Salary</span>
           </div>
         </motion.div>
-        
+
         <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 relative group overflow-hidden">
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-accentPurple/20 rounded-full blur-2xl group-hover:bg-accentPurple/40 transition-all"></div>
           <div className="flex justify-between items-start mb-4">
@@ -143,7 +143,7 @@ const DashboardOverview = () => {
           </div>
           <div className="text-3xl font-bold text-gradient mb-2">{dashboardData?.healthStatus}</div>
           <div className="flex items-center gap-1 text-accentCyan text-sm font-medium">
-             <span>Savings rate: {dashboardData?.savingsRate}%</span>
+            <span>Savings rate: {dashboardData?.savingsRate}%</span>
           </div>
         </motion.div>
       </div>
@@ -176,7 +176,7 @@ const DashboardOverview = () => {
               </div>
             )}
           </div>
-          
+
           <div className="bg-accentCyan/5 border border-accentCyan/20 rounded-xl p-5 flex flex-col gap-3">
             <div className="flex gap-4 items-start">
               <div className="p-2 bg-accentCyan/20 rounded-lg text-accentCyan mt-1 shrink-0"><Repeat size={18} /></div>
@@ -201,7 +201,7 @@ const DashboardOverview = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="glass-panel p-6 lg:col-span-1 flex flex-col">
           <h3 className="text-xl font-bold mb-6">Expense Breakdown</h3>
@@ -211,8 +211,8 @@ const DashboardOverview = () => {
                 <defs>
                   {COLORS.map((color, index) => (
                     <linearGradient key={`grad-${index}`} id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={color} stopOpacity={1}/>
-                      <stop offset="95%" stopColor={color} stopOpacity={0.6}/>
+                      <stop offset="5%" stopColor={color} stopOpacity={1} />
+                      <stop offset="95%" stopColor={color} stopOpacity={0.6} />
                     </linearGradient>
                   ))}
                 </defs>
@@ -247,7 +247,7 @@ const DashboardOverview = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="glass-panel p-6 lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold">Recent Transactions</h3>
@@ -257,9 +257,9 @@ const DashboardOverview = () => {
           </div>
           <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
             {transactions.map(tx => (
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.01, backgroundColor: 'rgba(255,255,255,0.03)' }}
-                key={tx.id} 
+                key={tx.id}
                 className="flex items-center justify-between p-4 rounded-xl border border-glassBorder transition-colors"
               >
                 <div className="flex items-center gap-4">
