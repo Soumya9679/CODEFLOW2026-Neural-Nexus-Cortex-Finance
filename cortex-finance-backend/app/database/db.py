@@ -77,6 +77,7 @@ def save_transactions(transactions, filename):
 
 def get_all_transactions():
     """Retrieves all transaction records from the database."""
+    init_db()  # Ensure database and table are initialized before query
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM transactions ORDER BY date ASC")
@@ -86,3 +87,4 @@ def get_all_transactions():
     transactions = [dict(row) for row in rows]
     conn.close()
     return transactions
+
