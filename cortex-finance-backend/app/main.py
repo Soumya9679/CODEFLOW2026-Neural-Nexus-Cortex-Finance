@@ -36,4 +36,25 @@ app.include_router(insights_router)
 def home():
     return {
         "message": "Cortex Finance Backend Running"
-    }
+    }
+
+@app.get("/healthz")
+def healthz():
+    import os
+    gemini_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    pinecone_key = os.environ.get("PINECONE_API_KEY")
+    hf_token = os.environ.get("HF_API_TOKEN")
+    db_url = os.environ.get("DATABASE_URL")
+    
+    return {
+        "status": "healthy",
+        "gemini_api_key_configured": bool(gemini_key),
+        "gemini_key_prefix": gemini_key[:6] + "..." if gemini_key else None,
+        "pinecone_api_key_configured": bool(pinecone_key),
+        "pinecone_key_prefix": pinecone_key[:6] + "..." if pinecone_key else None,
+        "hf_api_token_configured": bool(hf_token),
+        "hf_token_prefix": hf_token[:6] + "..." if hf_token else None,
+        "database_url_configured": bool(db_url),
+        "database_url_prefix": db_url[:15] + "..." if db_url else None
+    }
+
