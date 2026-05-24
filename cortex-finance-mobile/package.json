@@ -1,7 +1,7 @@
 {
   "name": "cortex-finance-mobile",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.0",
     "axios": "^1.16.1",
