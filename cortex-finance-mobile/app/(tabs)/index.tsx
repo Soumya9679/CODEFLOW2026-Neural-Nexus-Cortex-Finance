@@ -7,6 +7,8 @@ import { GlassCard } from '../../src/components/GlassCard';
 import apiClient from '../../src/services/api';
 import { DashboardData } from '../../src/services/types';
 import { useRouter } from 'expo-router';
+import { DashboardCharts } from '../../src/components/DashboardCharts';
+
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -177,17 +179,9 @@ export default function DashboardScreen() {
                 </GlassCard>
               </View>
 
-              {/* Chart Placeholder for Task 12 */}
+              {/* Interactive SVG Charts */}
               <GlassCard className="p-5">
-                <View className="flex-row justify-between items-center mb-4">
-                  <Text className="text-white text-sm font-bold">Monthly Trend</Text>
-                  <Text className="text-[#9898A3] text-xs">Past Months</Text>
-                </View>
-                {/* Visual Chart Placeholder */}
-                <View className="h-40 items-center justify-center bg-[#1E1E24]/30 rounded-xl border border-dashed border-[#2E2E35]">
-                  <PieIcon color="#5C5C66" size={24} />
-                  <Text className="text-[#9898A3] text-xs mt-2">Interactive SVG Chart loading...</Text>
-                </View>
+                <DashboardCharts monthlyTrend={data.monthly_trend || {}} />
               </GlassCard>
 
               {/* Categories breakdown */}
