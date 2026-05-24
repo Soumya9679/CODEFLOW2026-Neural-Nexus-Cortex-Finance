@@ -1,0 +1,39 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@layer theme {
+  @theme {
+    /* Fonts */
+    --font-rounded: "Outfit", sans-serif;
+    --font-sans: "Inter", sans-serif;
+
+    /* Custom Theme Colors */
+    --color-primary: #D7FF3F;
+    --color-primary-glow: rgba(215, 255, 63, 0.25);
+    --color-dark-bg: #0F0F11;
+    --color-dark-card: rgba(255, 255, 255, 0.06);
+    --color-dark-border: rgba(255, 255, 255, 0.05);
+    --color-dark-border-glow: rgba(215, 255, 63, 0.4);
+    --color-muted-text: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Platform-specific configuration */
+@media android {
+  :root {
+    --font-mono: monospace;
+    --font-rounded: normal;
+    --font-serif: serif;
+    --font-sans: normal;
+  }
+}
+
+@media ios {
+  :root {
+    --font-mono: ui-monospace;
+    --font-serif: ui-serif;
+    --font-sans: system-ui;
+    --font-rounded: ui-rounded;
+  }
+}
