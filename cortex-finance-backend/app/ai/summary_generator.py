@@ -22,12 +22,10 @@ def generate_financial_summary(analytics_data: dict) -> str:
     recurring = analytics_data.get("recurring_payments", [])
     score = analytics_data.get("score", 50.0)
 
-    # 1. Rules-based Fallback Narrative
     def get_rules_based_summary():
         if income == 0 and expense == 0:
             return "No transactions have been uploaded or parsed yet. Upload a bank statement to generate your profile summary."
 
-        # Find top spending category
         top_category = "None"
         top_amount = 0.0
         if categories:
@@ -50,7 +48,6 @@ def generate_financial_summary(analytics_data: dict) -> str:
         summary_text += f"Overall, your financial health score is rated at {score}/100."
         return summary_text
 
-    # 2. Try Local Ollama (qwen2.5:1.5b)
     if is_ollama_available():
         print("INFO: Local Ollama (qwen2.5:1.5b) is running. Using Ollama for financial summary.")
         try:
