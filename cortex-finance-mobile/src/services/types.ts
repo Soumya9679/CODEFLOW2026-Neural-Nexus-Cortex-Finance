@@ -14,16 +14,16 @@ export interface AuthResponse {
 
 // Transaction API Types
 export interface Transaction {
-  id: number;
-  user_id: number;
+  id?: number;
   date: string;
-  description: string;
-  amount: number;
+  narration: string;
+  debit: number;
+  credit: number;
+  balance: number;
   category: string;
-  type: 'income' | 'expense';
-  raw_text?: string;
-  confidence?: number;
-  created_at: string;
+  is_recurring: number;
+  is_anomaly: number;
+  filename: string;
 }
 
 // Dashboard Stats API Types
@@ -34,6 +34,30 @@ export interface DashboardStats {
   savings_rate: number;
   category_totals: Record<string, number>;
   monthly_totals: Record<string, { income: number; expense: number }>;
+}
+
+export interface DashboardAnomaly {
+  narration: string;
+  date: string;
+  category: string;
+  amount: number;
+}
+
+export interface DashboardRecurringPayment {
+  narration: string;
+  category: string;
+  amount: number;
+}
+
+export interface DashboardData {
+  income: number;
+  expense: number;
+  score: number;
+  savings_rate: number;
+  monthly_trend: Record<string, { income: number; expense: number }>;
+  categories: Record<string, number>;
+  anomalies?: DashboardAnomaly[];
+  recurring_payments?: DashboardRecurringPayment[];
 }
 
 // Chatbot API Types

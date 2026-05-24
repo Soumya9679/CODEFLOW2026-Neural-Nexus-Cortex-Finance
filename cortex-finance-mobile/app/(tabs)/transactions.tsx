@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { 
   RefreshControl, 
   ActivityIndicator, 
-  FlatList, 
-  TextInput,
   Platform
 } from 'react-native';
-import { View, Text, Pressable } from '../../src/tw';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, Pressable, ScrollView, SafeAreaView, FlatList, TextInput } from '../../src/tw';
 import { Header } from '../../src/components/Header';
 import { GlassCard } from '../../src/components/GlassCard';
 import * as DocumentPicker from 'expo-document-picker';

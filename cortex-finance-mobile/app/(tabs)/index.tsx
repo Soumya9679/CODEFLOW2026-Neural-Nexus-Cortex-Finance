@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshControl, ActivityIndicator } from 'react-native';
-import { View, Text, Pressable, ScrollView } from '../../src/tw';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, Pressable, ScrollView, SafeAreaView } from '../../src/tw';
 import { Header } from '../../src/components/Header';
 import { GlassCard } from '../../src/components/GlassCard';
 import apiClient from '../../src/services/api';

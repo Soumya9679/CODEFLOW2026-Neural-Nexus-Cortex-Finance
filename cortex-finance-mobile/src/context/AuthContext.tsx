@@ -27,9 +27,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize and check active session
   useEffect(() => {
     async function loadStoredSession() {
+      console.log('loadStoredSession started');
       try {
         const storedToken = await storage.getToken();
         const storedUser = await storage.getUser();
+        console.log('loadStoredSession retrieved:', { hasToken: !!storedToken, hasUser: !!storedUser });
 
         if (storedToken && storedUser) {
           setToken(storedToken);
@@ -37,7 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // Verify token against backend in background
           try {
+            console.log('loadStoredSession verifying token against backend...');
             const response = await apiClient.get<User>('/auth/me');
+            console.log('loadStoredSession verification success:', response.data);
             setUser(response.data);
             await storage.saveUser(response.data);
           } catch (err) {
@@ -48,6 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Failed to restore session:', err);
       } finally {
+        console.log('loadStoredSession finished, setting isLoading to false');
         setIsLoading(false);
       }
     }

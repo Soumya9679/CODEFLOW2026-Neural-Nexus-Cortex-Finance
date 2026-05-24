@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
-import { View, Text, TextInput, Pressable, ScrollView } from '../../src/tw';
+import { Platform, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, ScrollView, SafeAreaView, KeyboardAvoidingView } from '../../src/tw';
 import { useAuth } from '../../src/context/AuthContext';
 import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowRight, User as UserIcon, Mail, Lock } from 'lucide-react-native';
 
 export default function SignupScreen() {

@@ -1,13 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  KeyboardAvoidingView, 
   Platform, 
-  FlatList, 
-  TextInput, 
   ActivityIndicator 
 } from 'react-native';
-import { View, Text, Pressable } from '../../src/tw';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, Pressable, SafeAreaView, KeyboardAvoidingView, FlatList, TextInput } from '../../src/tw';
 import { Header } from '../../src/components/Header';
 import { GlassCard } from '../../src/components/GlassCard';
 import apiClient from '../../src/services/api';
@@ -38,7 +34,7 @@ export default function ChatScreen() {
   ]);
   const [inputText, setInputText] = useState('');
   const [sending, setSending] = useState(false);
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<any>(null);
 
   const sendMessage = async (textToSend: string) => {
     if (!textToSend.trim()) return;

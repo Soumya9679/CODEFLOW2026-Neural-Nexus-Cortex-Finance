@@ -53,7 +53,7 @@ export const Header: React.FC<HeaderProps> = ({ title, showWelcome = true }) => 
         >
           <View className="w-7 h-7 rounded-full bg-[#D7FF3F] items-center justify-center mr-2">
             <Text className="text-[#0F0F11] text-xs font-bold">
-              {getInitials(user?.full_name)}
+              {getInitials(user?.full_name || undefined)}
             </Text>
           </View>
           <LogOut color="#9898A3" size={15} />

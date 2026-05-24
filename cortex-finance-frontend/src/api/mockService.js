@@ -264,11 +264,13 @@ api.interceptors.request.use(
         try {
           const parsed = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
           if (parsed.message) {
-            config.data = JSON.stringify({ query: parsed.message });
+            config.data = { query: parsed.message };
+            config.headers['Content-Type'] = 'application/json';
           }
         } catch (e) {
           if (config.data.message) {
             config.data = { query: config.data.message };
+            config.headers['Content-Type'] = 'application/json';
           }
         }
       }

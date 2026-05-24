@@ -3,14 +3,17 @@ import { View, ActivityIndicator } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
-import '../src/global.css';
+import '../global.css';
 
 function RootLayoutNavigation() {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
+  console.log('RootLayoutNavigation render:', { isAuthenticated, isLoading, segments });
+
   useEffect(() => {
+    console.log('RootLayoutNavigation useEffect triggered:', { isAuthenticated, isLoading, segments });
     if (isLoading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
@@ -26,7 +29,7 @@ function RootLayoutNavigation() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-[#0F0F11] items-center justify-center">
+      <View style={{ flex: 1, backgroundColor: '#0F0F11', alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator size="large" color="#D7FF3F" />
       </View>
     );
