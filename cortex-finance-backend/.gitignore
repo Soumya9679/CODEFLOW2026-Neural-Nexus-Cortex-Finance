@@ -47,3 +47,5 @@ tmp/
 
 # HuggingFace Cache
 .cache/
+
+.env.example

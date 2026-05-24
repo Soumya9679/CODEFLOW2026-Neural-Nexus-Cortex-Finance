@@ -1,5 +1,6 @@
 import os
 import logging
+import app.utils.config  # Loads .env variables first
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from app.database.db import get_all_transactions

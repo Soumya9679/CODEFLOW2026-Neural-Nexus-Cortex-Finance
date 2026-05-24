@@ -1,30 +1,11 @@
 import os
 import json
 import google.generativeai as genai
+import app.utils.config  # Loads .env variables first
 from app.utils.ollama_client import is_ollama_available, get_ollama_llm
 
-def load_env_fallback():
-    """Manually reads .env variables if python-dotenv is not installed."""
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        # Search parent directories for .env
-        for path in [".env", "../.env", "../../.env", "../../../.env"]:
-            if os.path.exists(path):
-                with open(path, "r", encoding="utf-8") as f:
-                    for line in f:
-                        line = line.strip()
-                        if "=" in line and not line.startswith("#"):
-                            key, val = line.split("=", 1)
-                            os.environ[key.strip()] = val.strip().strip('"').strip("'")
-                break
-
-# Load env variables on module import
-load_env_fallback()
-
 # Fetch and configure Gemini API Key
-api_key = os.environ.get("GEMINI_API_KEY")
+api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 

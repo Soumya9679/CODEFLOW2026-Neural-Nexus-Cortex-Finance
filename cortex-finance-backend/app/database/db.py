@@ -2,6 +2,7 @@ import sqlite3
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import app.utils.config  # Loads .env variables first
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 IS_POSTGRES = DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")

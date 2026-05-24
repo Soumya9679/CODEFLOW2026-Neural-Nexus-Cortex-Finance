@@ -5,6 +5,7 @@ import jwt
 import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import app.utils.config  # Loads .env variables first
 from app.database.db import get_user_by_id
 
 # Secret key configuration
