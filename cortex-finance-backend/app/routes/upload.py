@@ -19,11 +19,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
-    """
-    Uploads a bank statement (PDF or CSV), parses transaction details, cleans them,
-    classifies categories (rules + AI fallback), detects anomalies & recurring items,
-    persists records, and rebuilds the semantic vector store.
-    """
+ 
     filename = file.filename
     ext = os.path.splitext(filename)[1].lower()
     
@@ -35,7 +31,6 @@ async def upload_file(file: UploadFile = File(...)):
 
     file_path = os.path.join(UPLOAD_DIR, filename)
 
-    # Save uploaded file
     try:
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -43,7 +38,6 @@ async def upload_file(file: UploadFile = File(...)):
         logger.error(f"Error saving uploaded file: {e}")
         raise HTTPException(status_code=500, detail="Failed to save the uploaded statement file.")
 
-    # 1. Parse statement based on file type
     try:
         if ext == ".pdf":
             transactions = parse_pdf(file_path)
@@ -59,7 +53,6 @@ async def upload_file(file: UploadFile = File(...)):
             detail="No valid transactions could be extracted from this statement. Please check the file formatting."
         )
 
-    # 2. Categorization Pipeline (Rules-based + Gemini AI Fallback)
     unmapped_narrations = []
     for tx in transactions:
         category = categorize_transaction(tx.get("narration", ""))
@@ -67,7 +60,6 @@ async def upload_file(file: UploadFile = File(...)):
         if category == "Others":
             unmapped_narrations.append(tx.get("narration", ""))
 
-    # Call Gemini to classify unmapped transactions in batch
     if unmapped_narrations:
         try:
             ai_categories = classify_transactions_gemini(unmapped_narrations)
@@ -100,9 +92,7 @@ async def upload_file(file: UploadFile = File(...)):
         for tx in transactions:
             tx["is_anomaly"] = 0
 
-    # 4. Detect Recurring Subscriptions/EMIs
     try:
-        # Format for recurring detector
         detector_input = []
         for i, tx in enumerate(transactions):
             debit_amt = float(tx.get("debit", 0.0) or 0.0)

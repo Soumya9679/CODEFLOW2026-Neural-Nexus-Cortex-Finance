@@ -13,6 +13,5 @@ def dashboard():
 
 @router.get("/transactions")
 def get_transactions():
-    """Retrieves all transactions from the SQLite database."""
     txs = get_all_transactions()
-    return {"transactions": txs}
+    return {"transactions": txs}

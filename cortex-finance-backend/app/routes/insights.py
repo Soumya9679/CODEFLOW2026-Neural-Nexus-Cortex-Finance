@@ -7,7 +7,6 @@ router = APIRouter()
 
 @router.get("/insights")
 def get_insights():
-    """Generates and returns personalized, actionable financial insights."""
     analytics_data = generate_dashboard_data()
     insights = generate_financial_insights(analytics_data)
     return {
@@ -16,7 +15,6 @@ def get_insights():
 
 @router.get("/summary")
 def get_summary():
-    """Generates and returns a narrative summary of the statement analysis."""
     analytics_data = generate_dashboard_data()
     summary = generate_financial_summary(analytics_data)
     return {
