@@ -191,7 +191,7 @@ export const configureApi = () => {
   const mode = localStorage.getItem('cortex_api_mode') || 'live';
 
   if (mode === 'live') {
-    api.defaults.baseURL = BACKEND_BASE_URL;
+    api.defaults.baseURL = 'https://codeflow2026-neural-nexus-cortex-finance-production.up.railway.app';
     mock.restore(); // Disable mockup interception
   } else {
     api.defaults.baseURL = 'https://api.cortexfinance.com/v1';
