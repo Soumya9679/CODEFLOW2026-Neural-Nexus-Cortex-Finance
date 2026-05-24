@@ -3,9 +3,9 @@ from collections import defaultdict
 from app.services.anomaly_detector import detect_anomalies
 from app.services.recurring_detector import detect_recurring_payments
 
-def generate_dashboard_data() -> dict:
+def generate_dashboard_data(user_id: int) -> dict:
     """
-    Calculates detailed financial analytics from database transactions.
+    Calculates detailed financial analytics from database transactions for a specific user.
     
     Returns:
     - income: Total credit amount.
@@ -19,7 +19,7 @@ def generate_dashboard_data() -> dict:
     - anomalies: Flagged anomalous transactions.
     - recurring_payments: Detected recurring subscriptions and EMIs.
     """
-    transactions = get_all_transactions()
+    transactions = get_all_transactions(user_id)
     
     # Defaults for empty database
     default_data = {

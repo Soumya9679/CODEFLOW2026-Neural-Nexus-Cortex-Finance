@@ -7,8 +7,8 @@ from app.utils.ollama_client import is_ollama_available, get_ollama_llm
 if api_key:
     genai.configure(api_key=api_key)
 
-def ask_question(query: str, chat_history: list = None) -> str:
-    context = retrieve_context(query, k=15)
+def ask_question(query: str, user_id: int, chat_history: list = None) -> str:
+    context = retrieve_context(query, user_id, k=15)
     
     history_context = ""
     if chat_history:

@@ -1,15 +1,14 @@
 // src/App.js
 
 import React, { useState } from "react";
-
 import {
   BrowserRouter,
   Routes,
-  Route
+  Route,
+  Navigate
 } from "react-router-dom";
 
 /* Pages */
-
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -19,21 +18,32 @@ import Dashboard from "./pages/Dashboard";
 import Chatbot from "./pages/Chatbot";
 
 /* CSS */
-
 import "./App.css";
 
-function App() {
+// Route Guards
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("cortex_token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
+const GuestRoute = ({ children }) => {
+  const token = localStorage.getItem("cortex_token");
+  if (token) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
+
+function App() {
   const [darkMode, setDarkMode] = useState(true);
 
   return (
-
     <div className={darkMode ? "theme-dark" : "theme-light"}>
-
       <BrowserRouter>
-
         {/* Theme Toggle */}
-
         <button
           className="toggle-btn"
           onClick={() => setDarkMode(!darkMode)}
@@ -42,7 +52,6 @@ function App() {
         </button>
 
         <Routes>
-
           <Route
             path="/"
             element={<LandingPage />}
@@ -50,38 +59,59 @@ function App() {
 
           <Route
             path="/login"
-            element={<Login />}
+            element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            }
           />
 
           <Route
             path="/signup"
-            element={<Signup />}
+            element={
+              <GuestRoute>
+                <Signup />
+              </GuestRoute>
+            }
           />
 
           <Route
             path="/upload"
-            element={<Upload />}
+            element={
+              <ProtectedRoute>
+                <Upload />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/processing"
-            element={<Processing />}
+            element={
+              <ProtectedRoute>
+                <Processing />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/dashboard/*"
-            element={<Dashboard />}
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/chatbot"
-            element={<Chatbot />}
+            element={
+              <ProtectedRoute>
+                <Chatbot />
+              </ProtectedRoute>
+            }
           />
-
         </Routes>
-
       </BrowserRouter>
-
     </div>
   );
 }

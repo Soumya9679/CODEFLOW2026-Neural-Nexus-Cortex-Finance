@@ -73,6 +73,20 @@ const mockInsightsData = {
 const setupMocks = () => {
   mock.reset();
 
+  mock.onPost('/auth/signup').reply(200, {
+    token: "mock_jwt_token_123456",
+    user: { id: 1, name: "Demo User", email: "demo@cortex.finance" }
+  });
+
+  mock.onPost('/auth/login').reply(200, {
+    token: "mock_jwt_token_123456",
+    user: { id: 1, name: "Demo User", email: "demo@cortex.finance" }
+  });
+
+  mock.onGet('/auth/me').reply(200, {
+    id: 1, name: "Demo User", email: "demo@cortex.finance", created_at: "2026-05-24"
+  });
+
   mock.onPost('/upload').reply(200, {
     message: "Bank statement successfully uploaded and analyzed.",
     status: "success"
@@ -209,9 +223,16 @@ api.interceptors.response.use(
   async (error) => {
     const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
-      console.warn("FastAPI backend request failed, falling back to mock:", error.message);
-      const url = error.config.url.replace(error.config.baseURL, '').split('?')[0];
+      const url = error.config?.url?.replace(error.config.baseURL, '').split('?')[0];
       
+      // If unauthorized (401), clear token
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('cortex_token');
+        localStorage.removeItem('cortex_user');
+        window.dispatchEvent(new Event('auth_change'));
+      }
+
+      console.warn("FastAPI backend request failed, falling back to mock:", error.message);
       if (url === '/dashboard') {
         return { data: mockDashboardData };
       } else if (url === '/transactions') {
@@ -226,16 +247,22 @@ api.interceptors.response.use(
   }
 );
 
-// Intercept request in live mode to adapt chat payload structure
+// Intercept request to inject auth headers and adapt payload structure
 api.interceptors.request.use(
   (config) => {
+    // Inject Authorization header if token exists in localStorage
+    const token = localStorage.getItem('cortex_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
       const url = config.url.replace(config.baseURL, '').split('?')[0];
       if (url === '/chat' && config.data) {
-        // Translate fronted { message } to backend { query }
+        // Translate frontend { message } to backend { query }
         try {
-          const parsed = JSON.parse(config.data);
+          const parsed = typeof config.data === 'string' ? JSON.parse(config.data) : config.data;
           if (parsed.message) {
             config.data = JSON.stringify({ query: parsed.message });
           }

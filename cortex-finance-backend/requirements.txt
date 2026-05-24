@@ -10,3 +10,7 @@ langchain-huggingface
 faiss-cpu
 sentence-transformers
 google-generativeai
+pyjwt
+passlib[bcrypt]
+psycopg2-binary
+pinecone-client

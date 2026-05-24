@@ -1,7 +1,7 @@
 import os
 import shutil
 import logging
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from app.services.pdf_parser import extract_transactions as parse_pdf
 from app.services.csv_parser import extract_transactions_csv as parse_csv
 from app.services.category_mapper import categorize_transaction
@@ -10,6 +10,7 @@ from app.services.anomaly_detector import detect_anomalies
 from app.services.recurring_detector import detect_recurring_payments
 from app.database.db import save_transactions, clear_db
 from app.rag.vector_store import rebuild_vector_store
+from app.utils.auth import get_current_user
 
 logger = logging.getLogger("upload_route")
 router = APIRouter()
@@ -18,8 +19,8 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
- 
+async def upload_file(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    user_id = current_user.get("id")
     filename = file.filename
     ext = os.path.splitext(filename)[1].lower()
     
@@ -29,7 +30,7 @@ async def upload_file(file: UploadFile = File(...)):
             detail="Unsupported file format. Only bank statements in PDF or CSV format are accepted."
         )
 
-    file_path = os.path.join(UPLOAD_DIR, filename)
+    file_path = os.path.join(UPLOAD_DIR, f"user_{user_id}_{filename}")
 
     try:
         with open(file_path, "wb") as buffer:
@@ -115,20 +116,27 @@ async def upload_file(file: UploadFile = File(...)):
         for tx in transactions:
             tx["is_recurring"] = 0
 
-    # 5. Database Persistence (Clearing previous data as we analyze a single statement at a time)
+    # 5. Database Persistence (scoped to user)
     try:
-        clear_db()
-        save_transactions(transactions, filename)
+        clear_db(user_id)
+        save_transactions(transactions, filename, user_id)
     except Exception as e:
         logger.error(f"Database save error: {e}")
         raise HTTPException(status_code=500, detail="Failed to save transaction records into the database.")
 
     # 6. Rebuild RAG Vector Store
     try:
-        rebuild_vector_store()
+        rebuild_vector_store(user_id)
     except Exception as e:
         logger.error(f"Vector store build error: {e}")
         # Non-fatal error; user still gets parsed transactions database and dashboard metrics
+
+    # Clean up uploaded local file to save space
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    except Exception:
+        pass
 
     return {
         "success": True,

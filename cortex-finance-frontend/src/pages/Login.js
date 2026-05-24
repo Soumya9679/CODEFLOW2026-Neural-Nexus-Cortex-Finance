@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Activity, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Activity, Mail, Lock, ArrowRight, AlertTriangle } from 'lucide-react';
+import api from '../api/mockService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/upload');
+    setError('');
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      if (response.data && response.data.token) {
+        localStorage.setItem('cortex_token', response.data.token);
+        localStorage.setItem('cortex_user', JSON.stringify(response.data.user));
+        // Dispatch auth_change event to notify other parts of App
+        window.dispatchEvent(new Event('auth_change'));
+        navigate('/upload');
+      } else {
+        setError('Unexpected authentication response. Please try again.');
+      }
+    } catch (err) {
+      console.error("Login failure:", err);
+      const errMsg = err.response?.data?.detail || 'Invalid email or password. Please try again.';
+      setError(errMsg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,6 +53,17 @@ const Login = () => {
           <h2 className="text-3xl font-bold text-white mb-2 font-outfit">Welcome Back</h2>
           <p className="text-[rgba(255,255,255,0.5)]">Sign in to resume your financial analysis</p>
         </div>
+
+        {error && (
+          <motion.div 
+            className="mb-6 p-4 rounded-xl bg-[rgba(255,92,117,0.15)] border border-[rgba(255,92,117,0.25)] text-[#FF5C75] text-sm flex items-center gap-3"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <AlertTriangle size={18} className="flex-shrink-0" />
+            <span>{error}</span>
+          </motion.div>
+        )}
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="relative">
@@ -42,6 +75,7 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] focus:border-[rgba(215,255,63,0.3)] focus:bg-[rgba(255,255,255,0.06)] text-white rounded-xl py-3.5 pl-12 pr-4 transition-all outline-none focus:shadow-[0_0_15px_rgba(215,255,63,0.08)]"
               required 
+              disabled={loading}
             />
           </div>
           
@@ -54,16 +88,18 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] focus:border-[rgba(215,255,63,0.3)] focus:bg-[rgba(255,255,255,0.06)] text-white rounded-xl py-3.5 pl-12 pr-4 transition-all outline-none focus:shadow-[0_0_15px_rgba(215,255,63,0.08)]"
               required 
+              disabled={loading}
             />
           </div>
           
           <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="btn btn-primary w-full py-4 mt-6 rounded-xl text-base font-bold" 
+            whileHover={{ scale: loading ? 1.0 : 1.02 }}
+            whileTap={{ scale: loading ? 1.0 : 0.98 }}
+            className="btn btn-primary w-full py-4 mt-6 rounded-xl text-base font-bold flex items-center justify-center gap-2" 
             type="submit"
+            disabled={loading}
           >
-            Sign In <ArrowRight size={20} />
+            {loading ? 'Signing In...' : 'Sign In'} <ArrowRight size={20} />
           </motion.button>
         </form>
         
