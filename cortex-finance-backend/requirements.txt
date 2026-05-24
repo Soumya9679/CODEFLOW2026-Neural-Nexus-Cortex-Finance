@@ -12,3 +12,5 @@ passlib[bcrypt]
 bcrypt
 psycopg2-binary
 pinecone
+python-dateutil
+email-validator
