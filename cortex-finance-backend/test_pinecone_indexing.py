@@ -2,7 +2,7 @@
 import os
 import sys
 import logging
-from dotenv import load_dotenv
+# Ensure we import config first to load env variables
 
 # Ensure we import config first to load env variables
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

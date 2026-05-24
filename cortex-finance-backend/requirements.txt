@@ -14,3 +14,4 @@ psycopg2-binary
 pinecone
 python-dateutil
 email-validator
+huggingface-hub
