@@ -1,22 +1,17 @@
-// src/components/Navbar.js
-
 import React from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
 
   return (
-
     <div className="dashboard-navbar">
 
       {/* Logo */}
-
       <h1 className="dashboard-logo">
         AI Bank Analyzer
       </h1>
 
       {/* Navigation Links */}
-
       <div className="nav-links">
 
         <Link to="/dashboard">

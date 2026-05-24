@@ -43,13 +43,7 @@ function App() {
   return (
     <div className={darkMode ? "theme-dark" : "theme-light"}>
       <BrowserRouter>
-        {/* Theme Toggle */}
-        <button
-          className="toggle-btn"
-          onClick={() => setDarkMode(!darkMode)}
-        >
-          {darkMode ? "🌞" : "🌙"}
-        </button>
+        
 
         <Routes>
           <Route
