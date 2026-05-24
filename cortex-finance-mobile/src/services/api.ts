@@ -1,15 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
-
-// Resolve backend URL based on platform/environment
-// 10.0.2.2 is the IP address pointing to localhost on Android Emulator
-// localhost works for iOS Simulator and Web
-export const API_BASE_URL = Platform.select({
-  android: 'http://10.0.2.2:8000',
-  ios: 'http://localhost:8000',
-  default: 'http://localhost:8000',
-});
+// Resolve backend URL pointing to the deployed production endpoint
+export const API_BASE_URL = 'https://codeflow2026-neural-nexus-cortex-finance-production.up.railway.app';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
