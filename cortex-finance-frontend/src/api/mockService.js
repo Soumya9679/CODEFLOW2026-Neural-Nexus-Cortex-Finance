@@ -100,7 +100,7 @@ const setupMocks = () => {
     const { message } = JSON.parse(config.data);
     const q = message.toLowerCase();
     let aiResponse = "I can help you analyze your finances using AI. Try asking me about your spending patterns or subscriptions!";
-    
+
     if (q.includes('spending') || q.includes('expenses')) {
       aiResponse = "### 📊 Spending Analysis\nYou spent **₹24,532** last week.\n\nHere is your top spending breakdown:\n1. **Rent**: 40%\n2. **Food/Dining**: 35%\n3. **Shopping**: 15%\n\n> *AI Tip: To save more, consider reducing food delivery frequency.*";
     } else if (q.includes('subscriptions') || q.includes('recurring')) {
@@ -108,7 +108,7 @@ const setupMocks = () => {
     } else if (q.includes('unusual')) {
       aiResponse = "⚠️ **Alert:** There is one unusual transaction detected:\n\n- **Swiggy (₹450)** today. \n\nThis is **40% higher** than your average weekday food delivery order.";
     }
-    
+
     return [200, { reply: aiResponse }];
   });
 };
@@ -153,7 +153,7 @@ const adaptTransactionsData = (rawTxs) => {
 const adaptInsightsData = (rawDash, rawInsightsResponse) => {
   const anomalies = rawDash?.anomalies || [];
   const recurring = rawDash?.recurring_payments || [];
-  
+
   const recurringFormatted = recurring.map(item => ({
     service: item.narration || item.service || 'Subscription',
     amount: item.amount || item.debit || 0
@@ -167,7 +167,7 @@ const adaptInsightsData = (rawDash, rawInsightsResponse) => {
     date: item.date
   }));
 
-  const overspendingMessage = anomalies.length > 0 
+  const overspendingMessage = anomalies.length > 0
     ? `We detected ${anomalies.length} anomalous transactions that significantly exceed your normal spending habits.`
     : "No unusual spending or anomalous transactions detected in this statement.";
 
@@ -189,9 +189,9 @@ const adaptInsightsData = (rawDash, rawInsightsResponse) => {
 // Dynamic Mode Configuration
 export const configureApi = () => {
   const mode = localStorage.getItem('cortex_api_mode') || 'live';
-  
+
   if (mode === 'live') {
-    api.defaults.baseURL = 'http://localhost:8000';
+    api.defaults.baseURL = 'codeflow2026-neural-nexus-cortex-finance-production.up.railway.app';
     mock.restore(); // Disable mockup interception
   } else {
     api.defaults.baseURL = 'https://api.cortexfinance.com/v1';
@@ -205,14 +205,14 @@ api.interceptors.response.use(
     const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
       const url = response.config.url.replace(response.config.baseURL, '').split('?')[0];
-      
+
       if (url === '/dashboard') {
         window.__lastRawDashboard = response.data;
         response.data = adaptDashboardData(response.data);
       } else if (url === '/transactions') {
         response.data = { transactions: adaptTransactionsData(response.data.transactions) };
       } else if (url === '/insights') {
-        const rawDashboard = window.__lastRawDashboard; 
+        const rawDashboard = window.__lastRawDashboard;
         response.data = adaptInsightsData(rawDashboard, response.data);
       } else if (url === '/chat') {
         response.data = { reply: response.data.response || response.data.reply };
@@ -224,7 +224,7 @@ api.interceptors.response.use(
     const mode = localStorage.getItem('cortex_api_mode') || 'live';
     if (mode === 'live') {
       const url = error.config?.url?.replace(error.config.baseURL, '').split('?')[0];
-      
+
       // If unauthorized (401), clear token
       if (error.response && error.response.status === 401) {
         localStorage.removeItem('cortex_token');
