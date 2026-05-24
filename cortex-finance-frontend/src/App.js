@@ -1,6 +1,6 @@
 // src/App.js
 
-import React from "react";
+import React, { useState } from "react";
 
 import {
   BrowserRouter,
@@ -24,58 +24,65 @@ import "./App.css";
 
 function App() {
 
+  const [darkMode, setDarkMode] = useState(true);
+
   return (
 
-    <BrowserRouter>
+    <div className={darkMode ? "theme-dark" : "theme-light"}>
 
-      <Routes>
+      <BrowserRouter>
 
-        {/* Landing Page */}
-        <Route
-          path="/"
-          element={<LandingPage />}
-        />
+        {/* Theme Toggle */}
 
-        {/* Login Page */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        <button
+          className="toggle-btn"
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? "🌞" : "🌙"}
+        </button>
 
-        {/* Signup Page */}
-        <Route
-          path="/signup"
-          element={<Signup />}
-        />
+        <Routes>
 
-        {/* Upload Page */}
-        <Route
-          path="/upload"
-          element={<Upload />}
-        />
+          <Route
+            path="/"
+            element={<LandingPage />}
+          />
 
-        {/* Processing Page */}
-        <Route
-          path="/processing"
-          element={<Processing />}
-        />
+          <Route
+            path="/login"
+            element={<Login />}
+          />
 
-        {/* Dashboard Page */}
-        <Route
-          path="/dashboard/*"
-          element={<Dashboard />}
-        />
+          <Route
+            path="/signup"
+            element={<Signup />}
+          />
 
-        {/* Chatbot Page */}
-        <Route
-          path="/chatbot"
-          element={<Chatbot />}
-        />
+          <Route
+            path="/upload"
+            element={<Upload />}
+          />
 
-      </Routes>
+          <Route
+            path="/processing"
+            element={<Processing />}
+          />
 
-    </BrowserRouter>
+          <Route
+            path="/dashboard/*"
+            element={<Dashboard />}
+          />
 
+          <Route
+            path="/chatbot"
+            element={<Chatbot />}
+          />
+
+        </Routes>
+
+      </BrowserRouter>
+
+    </div>
   );
 }
 
