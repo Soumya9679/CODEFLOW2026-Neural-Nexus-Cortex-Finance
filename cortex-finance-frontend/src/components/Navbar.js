@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Navbar() {
+function Navbar({ darkMode, setDarkMode }) {
 
   return (
-    <div className="dashboard-navbar">
+    <div className={darkMode ? "dashboard-navbar dark" : "dashboard-navbar light"}>
 
       {/* Logo */}
       <h1 className="dashboard-logo">
@@ -14,30 +14,15 @@ function Navbar() {
       {/* Navigation Links */}
       <div className="nav-links">
 
-        <Link to="/dashboard">
-          <button className="nav-btn">
-            Dashboard
-          </button>
-        </Link>
+        {/* 🌙 ICON TOGGLE ONLY */}
+        <button
+          className="nav-btn toggle-btn"
+          onClick={() => setDarkMode(!darkMode)}
+        >
+          {darkMode ? "🌞" : "🌙"}
+        </button>
 
-        <Link to="/upload">
-          <button className="nav-btn">
-            Upload
-          </button>
-        </Link>
-
-        <Link to="/chatbot">
-          <button className="nav-btn">
-            AI Assistant
-          </button>
-        </Link>
-
-        <Link to="/">
-          <button className="logout-button">
-            Logout
-          </button>
-        </Link>
-
+        
       </div>
 
     </div>
