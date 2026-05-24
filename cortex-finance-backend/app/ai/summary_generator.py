@@ -96,7 +96,7 @@ Instructions:
 - Address the general cash flow, top spending category, and overall health score rating.
 - Do not use any introductory tags (like "Here is the summary:") or bullet points. Just return the raw paragraph.
 """
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(prompt)
         return response.text.strip()
 

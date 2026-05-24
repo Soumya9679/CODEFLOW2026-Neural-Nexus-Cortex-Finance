@@ -96,7 +96,7 @@ Example output format:
 }}
 Do not write any conversational intro or outro text, only return the clean JSON block.
 """
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(
             prompt,
             generation_config={"response_mime_type": "application/json"}

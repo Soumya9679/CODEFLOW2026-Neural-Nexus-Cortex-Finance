@@ -121,7 +121,7 @@ Instructions:
 - Emphasize specific issues like high discretionary spending, recurring charges, low savings rate, or anomalous transactions if present.
 - Do not return any conversational intro or outro text, only return the list of bullet points starting with standard icons (like 💰, ⚠️, 🔴, 🟢, 🛍️, 🔄).
 """
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(prompt)
         
         lines = [line.strip().lstrip("-* ").strip() for line in response.text.strip().split("\n") if line.strip()]

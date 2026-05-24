@@ -1,8 +1,9 @@
 import os
+import requests
 import logging
 import app.utils.config  # Loads .env variables first
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.embeddings import Embeddings
 from app.database.db import get_all_transactions
 from pinecone import Pinecone, ServerlessSpec
 
@@ -15,13 +16,92 @@ INDEX_BASE_PATH = os.path.dirname(__file__)
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "cortex-finance")
 
-# Initialize Hugging Face embeddings using a lightweight, fast model
+class HuggingFaceInferenceEmbeddings(Embeddings):
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2", api_token: str = None):
+        self.model_name = model_name
+        self.api_token = api_token or os.getenv("HF_API_TOKEN", "")
+        # Use router.huggingface.co as the primary endpoint since it resolves more reliably
+        self.api_url = f"https://router.huggingface.co/models/{model_name}"
+
+    def _query(self, texts: list[str]) -> list[list[float]]:
+        if not self.api_token:
+            logger.warning("HF_API_TOKEN is not set. Hugging Face Inference API calls may fail.")
+            
+        headers = {}
+        if self.api_token:
+            headers["Authorization"] = f"Bearer {self.api_token}"
+
+        try:
+            response = requests.post(
+                self.api_url,
+                headers=headers,
+                json={"inputs": texts, "options": {"wait_for_model": True}},
+                timeout=30
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"HF API returned status {response.status_code}: {response.text[:500]}")
+                raise ValueError(f"HuggingFace API error: Status {response.status_code}")
+                
+            res = response.json()
+            
+            # The inference API feature-extraction pipeline returns a list of floats (1D) or nested lists (2D/3D).
+            # For multiple texts, it returns [num_texts, embedding_dim].
+            # For 1 text, it might return a 1D list of floats [embedding_dim] or a 2D list [[embedding_dim]].
+            # We normalize this to a list of lists of floats.
+            if not isinstance(res, list):
+                raise ValueError(f"Unexpected response type from HuggingFace API: {type(res)}")
+                
+            if len(res) == 0:
+                return []
+                
+            # If it's a 1D list of numbers (for a single document):
+            if not isinstance(res[0], list):
+                return [res]
+                
+            # If the response contains 3D outputs (e.g. per-token embeddings), average them:
+            if isinstance(res[0][0], list):
+                # Mean pool or take the first token (CLS token equivalent) representation
+                averaged_res = []
+                for doc_tokens in res:
+                    num_tokens = len(doc_tokens)
+                    dim = len(doc_tokens[0])
+                    avg_vector = [0.0] * dim
+                    for token_vec in doc_tokens:
+                        for idx, val in enumerate(token_vec):
+                            avg_vector[idx] += val
+                    averaged_res.append([val / num_tokens for val in avg_vector])
+                return averaged_res
+                
+            return res
+        except Exception as e:
+            logger.error(f"Failed to fetch embeddings from HuggingFace Inference API: {e}")
+            raise e
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        batch_size = 32
+        embeddings = []
+        for i in range(0, len(texts), batch_size):
+            chunk = texts[i:i+batch_size]
+            embeddings.extend(self._query(chunk))
+        return embeddings
+
+    def embed_query(self, text: str) -> list[float]:
+        try:
+            res = self._query([text])
+            if res and len(res) > 0:
+                return res[0]
+        except Exception as e:
+            logger.error(f"Error in embed_query: {e}")
+        return [0.0] * 384
+
+# Initialize our new cloud-based Inference API embedding model
 try:
-    embedding_model = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+    embedding_model = HuggingFaceInferenceEmbeddings()
 except Exception as e:
-    logger.error(f"Failed to load Hugging Face embedding model: {e}")
+    logger.error(f"Failed to initialize Hugging Face Inference embedding model: {e}")
     embedding_model = None
 
 def get_pinecone_index():

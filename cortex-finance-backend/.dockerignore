@@ -1,0 +1,15 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+cortex_finance.db
+uploads/*
+!uploads/.gitkeep
+vector_store/*
+!vector_store/.gitkeep
+Dockerfile
+.dockerignore

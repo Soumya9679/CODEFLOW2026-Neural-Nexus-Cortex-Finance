@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "app"))
 
+import app.utils.config  # Run fallback loader first
 # Ensure we use an isolated test db path during tests
 os.environ["DATABASE_URL"] = ""  # SQLite fallback
 test_db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_cortex_finance.db")

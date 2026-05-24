@@ -6,10 +6,6 @@ from app.rag.vector_store import embedding_model, INDEX_BASE_PATH, get_pinecone_
 logger = logging.getLogger("retriever")
 
 def retrieve_context(query: str, user_id: int, k: int = 10) -> str:
-    """
-    Queries the Pinecone index or local FAISS fallback to find the top k most semantically relevant 
-    transaction records corresponding to the user's inquiry, scoped to the current user.
-    """
     namespace = f"user_{user_id}"
     
     # 1. Try Pinecone query first
