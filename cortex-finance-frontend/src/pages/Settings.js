@@ -48,16 +48,16 @@ const Settings = () => {
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">System Settings</h1>
-          <p className="text-textSecondary mt-1">Configure your API connection and local data preferences</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight font-outfit">System Settings</h1>
+          <p className="text-[rgba(255,255,255,0.4)] mt-1 text-sm">Configure your API connection and local data preferences</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={checkBackendStatus}
-          className="p-3 bg-slate-800/80 hover:bg-slate-700/80 text-textSecondary hover:text-white rounded-xl transition-all border border-slate-700/50 flex items-center gap-2"
+          className="p-3 bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.5)] hover:text-white rounded-xl transition-all border border-[rgba(255,255,255,0.05)] flex items-center gap-2 text-sm"
         >
-          <RefreshCw size={18} className={backendStatus === 'checking' ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={backendStatus === 'checking' ? 'animate-spin' : ''} />
           <span>Refresh API Status</span>
         </motion.button>
       </div>
@@ -67,9 +67,9 @@ const Settings = () => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="p-4 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 rounded-xl flex items-center gap-3"
+          className="p-4 bg-[rgba(166,255,77,0.08)] border border-[rgba(166,255,77,0.15)] text-[#A6FF4D] rounded-xl flex items-center gap-3 text-sm"
         >
-          <CheckCircle2 size={20} />
+          <CheckCircle2 size={18} />
           <span>{statusMessage}</span>
         </motion.div>
       )}
@@ -78,14 +78,14 @@ const Settings = () => {
         {/* Connection Strategy */}
         <div className="glass-panel p-8 space-y-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-accentCyan/15 text-accentCyan">
-              <Server size={20} />
+            <div className="p-2 rounded-xl bg-[rgba(215,255,63,0.1)] text-[#D7FF3F]">
+              <Server size={18} />
             </div>
-            <h2 className="text-xl font-semibold text-white">API Connection Strategy</h2>
+            <h2 className="text-lg font-semibold text-white font-outfit">API Connection Strategy</h2>
           </div>
 
-          <p className="text-textSecondary text-sm leading-relaxed">
-            Choose whether the application should call your live local FastAPI server running on <code className="bg-slate-950 px-2 py-1 rounded text-accentCyan">http://localhost:8000</code> or use simulated mock data.
+          <p className="text-[rgba(255,255,255,0.45)] text-sm leading-relaxed">
+            Choose whether the application should call your live local FastAPI server running on <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">http://localhost:8000</code> or use simulated mock data.
           </p>
 
           <div className="space-y-3">
@@ -93,30 +93,30 @@ const Settings = () => {
               onClick={() => handleModeChange('mock')}
               className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
                 apiMode === 'mock'
-                  ? 'bg-accentCyan/10 border-accentCyan text-white'
-                  : 'bg-slate-900/30 border-slate-800 text-textSecondary hover:border-slate-700 hover:text-white'
+                  ? 'bg-[rgba(215,255,63,0.06)] border-[rgba(215,255,63,0.2)] text-white'
+                  : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(255,255,255,0.1)] hover:text-white'
               }`}
             >
               <div>
-                <div className="font-medium">Mock Data (Offline Mode)</div>
-                <div className="text-xs text-textSecondary mt-0.5">Use static client-side financial statements</div>
+                <div className="font-medium text-sm">Mock Data (Offline Mode)</div>
+                <div className="text-[10px] text-[rgba(255,255,255,0.35)] mt-0.5">Use static client-side financial statements</div>
               </div>
-              {apiMode === 'mock' && <div className="w-2.5 h-2.5 rounded-full bg-accentCyan"></div>}
+              {apiMode === 'mock' && <div className="w-2.5 h-2.5 rounded-full bg-[#D7FF3F] shadow-[0_0_8px_rgba(215,255,63,0.5)]"></div>}
             </button>
 
             <button
               onClick={() => handleModeChange('live')}
               className={`w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between ${
                 apiMode === 'live'
-                  ? 'bg-accentCyan/10 border-accentCyan text-white'
-                  : 'bg-slate-900/30 border-slate-800 text-textSecondary hover:border-slate-700 hover:text-white'
+                  ? 'bg-[rgba(215,255,63,0.06)] border-[rgba(215,255,63,0.2)] text-white'
+                  : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(255,255,255,0.1)] hover:text-white'
               }`}
             >
               <div>
-                <div className="font-medium">Live FastAPI Server</div>
-                <div className="text-xs text-textSecondary mt-0.5">Query local API endpoints at http://localhost:8000</div>
+                <div className="font-medium text-sm">Live FastAPI Server</div>
+                <div className="text-[10px] text-[rgba(255,255,255,0.35)] mt-0.5">Query local API endpoints at http://localhost:8000</div>
               </div>
-              {apiMode === 'live' && <div className="w-2.5 h-2.5 rounded-full bg-accentCyan"></div>}
+              {apiMode === 'live' && <div className="w-2.5 h-2.5 rounded-full bg-[#D7FF3F] shadow-[0_0_8px_rgba(215,255,63,0.5)]"></div>}
             </button>
           </div>
         </div>
@@ -125,19 +125,19 @@ const Settings = () => {
         <div className="glass-panel p-8 space-y-6 flex flex-col justify-between">
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-accentCyan/15 text-accentCyan">
-                {backendStatus === 'online' ? <Wifi size={20} /> : <WifiOff size={20} />}
+              <div className="p-2 rounded-xl bg-[rgba(215,255,63,0.1)] text-[#D7FF3F]">
+                {backendStatus === 'online' ? <Wifi size={18} /> : <WifiOff size={18} />}
               </div>
-              <h2 className="text-xl font-semibold text-white">Service Health Status</h2>
+              <h2 className="text-lg font-semibold text-white font-outfit">Service Health Status</h2>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800 flex items-center justify-between">
-              <span className="text-textSecondary text-sm font-medium">FastAPI Backend Status:</span>
+            <div className="p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)] flex items-center justify-between">
+              <span className="text-[rgba(255,255,255,0.45)] text-sm font-medium">FastAPI Backend Status:</span>
               <div className="flex items-center gap-2">
                 <span className={`w-2.5 h-2.5 rounded-full ${
-                  backendStatus === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' :
-                  backendStatus === 'offline' ? 'bg-rose-500 shadow-[0_0_8px_#f43f5e]' :
-                  'bg-amber-500 shadow-[0_0_8px_#f59e0b]'
+                  backendStatus === 'online' ? 'bg-[#A6FF4D] shadow-[0_0_8px_rgba(166,255,77,0.5)]' :
+                  backendStatus === 'offline' ? 'bg-[#FF5C75] shadow-[0_0_8px_rgba(255,92,117,0.5)]' :
+                  'bg-[#FFB84D] shadow-[0_0_8px_rgba(255,184,77,0.5)]'
                 }`}></span>
                 <span className="text-sm font-semibold capitalize text-white">
                   {backendStatus === 'online' ? 'Connected' :
@@ -146,23 +146,23 @@ const Settings = () => {
               </div>
             </div>
 
-            <p className="text-textSecondary text-sm leading-relaxed">
-              Ensure you have run the backend server using <code className="bg-slate-950 px-2 py-1 rounded text-accentCyan">uvicorn main:app --reload</code> inside the <code className="bg-slate-950 px-2 py-1 rounded text-accentCyan">cortex-finance-backend</code> directory.
+            <p className="text-[rgba(255,255,255,0.4)] text-sm leading-relaxed">
+              Ensure you have run the backend server using <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">uvicorn main:app --reload</code> inside the <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">cortex-finance-backend</code> directory.
             </p>
           </div>
 
-          <div className="pt-4 border-t border-slate-800/80">
+          <div className="pt-4 border-t border-[rgba(255,255,255,0.05)]">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-textSecondary text-sm">
-                <Database size={16} />
+              <div className="flex items-center gap-2 text-[rgba(255,255,255,0.4)] text-sm">
+                <Database size={14} />
                 <span>Reset Application Cache</span>
               </div>
               <button
                 onClick={handleClearData}
                 disabled={isClearing}
-                className="btn btn-secondary px-4 py-2 text-xs flex items-center gap-2 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-400 transition-all border border-slate-700 bg-transparent text-textSecondary rounded-lg disabled:opacity-50"
+                className="px-4 py-2 text-xs flex items-center gap-2 bg-transparent hover:bg-[rgba(255,92,117,0.08)] border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,92,117,0.2)] text-[rgba(255,255,255,0.5)] hover:text-[#FF5C75] rounded-lg transition-all disabled:opacity-50"
               >
-                {isClearing ? <RefreshCw size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                {isClearing ? <RefreshCw size={13} className="animate-spin" /> : <Trash2 size={13} />}
                 <span>{isClearing ? 'Clearing...' : 'Clear Cache'}</span>
               </button>
             </div>

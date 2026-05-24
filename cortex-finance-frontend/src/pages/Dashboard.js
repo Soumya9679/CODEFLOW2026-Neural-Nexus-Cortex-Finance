@@ -8,14 +8,14 @@ import Chatbot from './Chatbot';
 import Settings from './Settings';
 import api from '../api/mockService';
 
-const COLORS = ['#00f0ff', '#b026ff', '#00ff88', '#ff5f56', '#facc15'];
+const COLORS = ['#D7FF3F', '#A6FF4D', '#52A8FF', '#FFB84D', '#FF5C75'];
 
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="glass-panel p-3 border-accentCyan/30 border shadow-xl">
-        <p className="font-semibold text-white">{payload[0].name}</p>
-        <p className="text-accentCyan font-medium">₹{payload[0].value}</p>
+      <div className="bg-[rgba(21,21,24,0.95)] backdrop-blur-[18px] p-3 rounded-xl border border-[rgba(255,255,255,0.08)] shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+        <p className="font-semibold text-white text-sm">{payload[0].name}</p>
+        <p className="text-[#D7FF3F] font-medium text-sm">₹{payload[0].value}</p>
       </div>
     );
   }
@@ -77,11 +77,11 @@ const DashboardOverview = () => {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-[80vh]">
         <div className="relative">
-          <Loader2 className="animate-spin text-accentCyan" size={64} />
-          <div className="absolute inset-0 rounded-full blur-xl bg-accentCyan/30 animate-pulse"></div>
+          <Loader2 className="animate-spin text-[#D7FF3F]" size={64} />
+          <div className="absolute inset-0 rounded-full blur-xl bg-[rgba(215,255,63,0.2)] animate-pulse"></div>
         </div>
-        <h2 className="mt-6 text-2xl font-semibold text-white tracking-wide">Analyzing Statements...</h2>
-        <p className="text-textSecondary mt-2">Cortex AI is categorizing your transactions</p>
+        <h2 className="mt-6 text-2xl font-semibold text-white tracking-wide font-outfit">Analyzing Statements...</h2>
+        <p className="text-[rgba(255,255,255,0.5)] mt-2">Cortex AI is categorizing your transactions</p>
       </div>
     );
   }
@@ -95,81 +95,83 @@ const DashboardOverview = () => {
     >
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold mb-1">Financial Overview</h1>
-          <p className="text-textSecondary">AI-generated summary of your recent bank statement.</p>
+          <h1 className="text-4xl font-extrabold mb-1 font-outfit text-white">Financial Summary</h1>
+          <p className="text-[rgba(255,255,255,0.5)]">Track your monthly activities</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-accentCyan/10 text-accentCyan px-4 py-2 rounded-full border border-accentCyan/30 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
-            <Zap size={16} className="animate-pulse" />
-            <span className="text-sm font-medium">AI Analysis Complete</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-[rgba(215,255,63,0.08)] text-[#D7FF3F] px-4 py-2 rounded-full border border-[rgba(215,255,63,0.15)] shadow-[0_0_15px_rgba(215,255,63,0.1)]">
+            <Zap size={14} className="animate-pulse" />
+            <span className="text-xs font-semibold">AI Analysis Complete</span>
           </div>
-          <button onClick={exportToCSV} className="btn bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-colors py-2 px-4 rounded-xl text-sm flex items-center gap-2">
-            <Download size={16} />
+          <button onClick={exportToCSV} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.65)] hover:text-white border border-[rgba(255,255,255,0.05)] transition-all duration-300">
+            <Download size={15} />
             Export
           </button>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 ai-glow relative group overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-accentGreen/20 rounded-full blur-2xl group-hover:bg-accentGreen/40 transition-all"></div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+        <motion.div whileHover={{ y: -4, transition: { duration: 0.3 } }} className="glass-panel p-6 relative group overflow-hidden">
+          <div className="absolute -right-6 -top-6 w-28 h-28 bg-[rgba(166,255,77,0.08)] rounded-full blur-2xl group-hover:bg-[rgba(166,255,77,0.15)] transition-all duration-500"></div>
           <div className="flex justify-between items-start mb-4">
-            <span className="text-textSecondary font-medium">Total Income</span>
-            <div className="p-2 rounded-lg bg-accentGreen/20 text-accentGreen"><Wallet size={20} /></div>
+            <span className="text-[rgba(255,255,255,0.5)] text-sm font-medium">Total Income</span>
+            <div className="p-2 rounded-xl bg-[rgba(166,255,77,0.1)] text-[#A6FF4D]"><Wallet size={18} /></div>
           </div>
-          <div className="text-3xl font-bold text-white mb-2">₹{dashboardData?.totalIncome.toLocaleString()}</div>
-          <div className="flex items-center gap-1 text-accentGreen text-sm font-medium">
-            <span>Primary Source: Salary</span>
+          <div className="text-3xl font-bold text-white mb-2 font-outfit">₹{dashboardData?.totalIncome.toLocaleString()}</div>
+          <div className="flex items-center gap-1 text-[#A6FF4D] text-xs font-medium">
+            <ArrowUpRight size={14} /><span>Primary Source: Salary</span>
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 relative group overflow-hidden">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-accentPurple/20 rounded-full blur-2xl group-hover:bg-accentPurple/40 transition-all"></div>
+        <motion.div whileHover={{ y: -4, transition: { duration: 0.3 } }} className="glass-panel p-6 relative group overflow-hidden">
+          <div className="absolute -right-6 -top-6 w-28 h-28 bg-[rgba(255,92,117,0.06)] rounded-full blur-2xl group-hover:bg-[rgba(255,92,117,0.12)] transition-all duration-500"></div>
           <div className="flex justify-between items-start mb-4">
-            <span className="text-textSecondary font-medium">Total Expenses</span>
-            <div className="p-2 rounded-lg bg-accentPurple/20 text-accentPurple"><TrendingUp size={20} /></div>
+            <span className="text-[rgba(255,255,255,0.5)] text-sm font-medium">Total Expenses</span>
+            <div className="p-2 rounded-xl bg-[rgba(255,92,117,0.1)] text-[#FF5C75]"><TrendingUp size={18} /></div>
           </div>
-          <div className="text-3xl font-bold text-white mb-2">₹{dashboardData?.totalExpenses.toLocaleString()}</div>
-          <div className="flex items-center gap-1 text-accentPurple text-sm font-medium">
-            <ArrowUpRight size={16} /> <span>High spending week</span>
+          <div className="text-3xl font-bold text-white mb-2 font-outfit">₹{dashboardData?.totalExpenses.toLocaleString()}</div>
+          <div className="flex items-center gap-1 text-[#FF5C75] text-xs font-medium">
+            <ArrowUpRight size={14} /> <span>High spending week</span>
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ y: -5 }} className="glass-panel p-6 relative group overflow-hidden border border-accentCyan/20">
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-accentCyan/20 rounded-full blur-2xl group-hover:bg-accentCyan/40 transition-all"></div>
+        <motion.div whileHover={{ y: -4, transition: { duration: 0.3 } }} className="glass-panel p-6 relative group overflow-hidden border border-[rgba(215,255,63,0.1)]">
+          <div className="absolute -right-6 -top-6 w-28 h-28 bg-[rgba(215,255,63,0.06)] rounded-full blur-2xl group-hover:bg-[rgba(215,255,63,0.12)] transition-all duration-500"></div>
           <div className="flex justify-between items-start mb-4">
-            <span className="text-textSecondary font-medium">Financial Health</span>
-            <div className="p-2 rounded-lg bg-accentCyan/20 text-accentCyan"><Zap size={20} /></div>
+            <span className="text-[rgba(255,255,255,0.5)] text-sm font-medium">Financial Health</span>
+            <div className="p-2 rounded-xl bg-[rgba(215,255,63,0.1)] text-[#D7FF3F]"><Zap size={18} /></div>
           </div>
-          <div className="text-3xl font-bold text-gradient mb-2">
-            {dashboardData?.healthStatus} <span className="text-lg font-semibold text-textSecondary">({dashboardData?.score || 50}/100)</span>
+          <div className="text-3xl font-bold text-gradient mb-2 font-outfit">
+            {dashboardData?.healthStatus} <span className="text-base font-semibold text-[rgba(255,255,255,0.4)]">({dashboardData?.score || 50}/100)</span>
           </div>
-          <div className="flex items-center gap-1 text-accentCyan text-sm font-medium">
+          <div className="flex items-center gap-1 text-[#D7FF3F] text-xs font-medium">
             <span>Savings rate: {dashboardData?.savingsRate}%</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-3 overflow-hidden">
+          <div className="w-full bg-[rgba(255,255,255,0.06)] rounded-full h-1.5 mt-3 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-accentCyan to-accentPurple h-1.5 rounded-full" 
+              className="bg-gradient-to-r from-[#D7FF3F] to-[#A6FF4D] h-1.5 rounded-full shadow-[0_0_8px_rgba(215,255,63,0.4)]" 
               style={{ width: `${dashboardData?.score || 50}%` }}
             ></div>
           </div>
         </motion.div>
       </div>
 
-      <div className="glass-panel p-6 mb-8 border border-accentCyan/30 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accentCyan to-accentPurple"></div>
-        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <Zap size={20} className="text-accentCyan" /> AI Insights & Recommendations
+      {/* AI Insights */}
+      <div className="glass-panel p-6 mb-8 border border-[rgba(215,255,63,0.08)] relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#D7FF3F] to-[#A6FF4D]"></div>
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
+          <Zap size={18} className="text-[#D7FF3F]" /> AI Insights & Recommendations
         </h3>
 
         {insights?.aiInsightsList && insights.aiInsightsList.length > 0 && (
-          <div className="mb-6 p-4 rounded-xl bg-slate-900/50 border border-glassBorder">
-            <h4 className="font-semibold text-accentCyan text-sm mb-3 uppercase tracking-wider">Cortex AI Recommendations</h4>
+          <div className="mb-6 p-4 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.05)]">
+            <h4 className="font-semibold text-[#D7FF3F] text-xs mb-3 uppercase tracking-widest">Cortex AI Recommendations</h4>
             <ul className="space-y-2">
               {insights.aiInsightsList.map((recommendation, idx) => (
-                <li key={idx} className="flex items-start gap-2.5 text-sm text-textSecondary">
-                  <span className="w-1.5 h-1.5 rounded-full bg-accentCyan mt-2 shrink-0"></span>
-                  <span className="text-white/90">{recommendation}</span>
+                <li key={idx} className="flex items-start gap-2.5 text-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#D7FF3F] mt-2 shrink-0 shadow-[0_0_6px_rgba(215,255,63,0.5)]"></span>
+                  <span className="text-[rgba(255,255,255,0.75)]">{recommendation}</span>
                 </li>
               ))}
             </ul>
@@ -177,22 +179,22 @@ const DashboardOverview = () => {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-5 flex flex-col gap-3">
+          <div className="bg-[rgba(255,92,117,0.04)] border border-[rgba(255,92,117,0.1)] rounded-xl p-5 flex flex-col gap-3">
             <div className="flex gap-4 items-start">
-              <div className="p-2 bg-red-500/20 rounded-lg text-red-400 mt-1 shrink-0"><AlertTriangle size={18} /></div>
+              <div className="p-2 bg-[rgba(255,92,117,0.12)] rounded-xl text-[#FF5C75] mt-1 shrink-0"><AlertTriangle size={18} /></div>
               <div>
-                <h4 className="font-semibold text-white mb-1">Overspending Detected</h4>
-                <p className="text-sm text-red-200/80">{insights?.overspending.message}</p>
+                <h4 className="font-semibold text-white mb-1 text-sm">Overspending Detected</h4>
+                <p className="text-xs text-[rgba(255,92,117,0.7)]">{insights?.overspending.message}</p>
               </div>
             </div>
             {insights?.overspending?.items && (
               <div className="mt-2 pl-14 pr-2">
-                <p className="text-xs font-semibold text-red-300/70 mb-2 uppercase tracking-wider">Top Contributors</p>
+                <p className="text-[10px] font-semibold text-[rgba(255,92,117,0.5)] mb-2 uppercase tracking-widest">Top Contributors</p>
                 <div className="space-y-2">
                   {insights.overspending.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-sm bg-red-950/30 p-2 rounded-lg border border-red-500/10">
-                      <span className="text-red-100">{item.name} <span className="text-red-300/50 text-xs ml-1">({item.date})</span></span>
-                      <span className="font-medium text-red-400">₹{item.amount}</span>
+                    <div key={idx} className="flex justify-between items-center text-xs bg-[rgba(255,92,117,0.06)] p-2.5 rounded-lg border border-[rgba(255,92,117,0.08)]">
+                      <span className="text-[rgba(255,255,255,0.7)]">{item.name} <span className="text-[rgba(255,255,255,0.3)] ml-1">({item.date})</span></span>
+                      <span className="font-semibold text-[#FF5C75]">₹{item.amount}</span>
                     </div>
                   ))}
                 </div>
@@ -200,22 +202,22 @@ const DashboardOverview = () => {
             )}
           </div>
 
-          <div className="bg-accentCyan/5 border border-accentCyan/20 rounded-xl p-5 flex flex-col gap-3">
+          <div className="bg-[rgba(215,255,63,0.03)] border border-[rgba(215,255,63,0.08)] rounded-xl p-5 flex flex-col gap-3">
             <div className="flex gap-4 items-start">
-              <div className="p-2 bg-accentCyan/20 rounded-lg text-accentCyan mt-1 shrink-0"><Repeat size={18} /></div>
+              <div className="p-2 bg-[rgba(215,255,63,0.1)] rounded-xl text-[#D7FF3F] mt-1 shrink-0"><Repeat size={18} /></div>
               <div>
-                <h4 className="font-semibold text-white mb-1">Recurring Payments</h4>
-                <p className="text-sm text-accentCyan/80">Identified {insights?.recurring?.length || 0} active subscriptions totaling ₹{insights?.totalRecurring}/mo.</p>
+                <h4 className="font-semibold text-white mb-1 text-sm">Recurring Payments</h4>
+                <p className="text-xs text-[rgba(215,255,63,0.6)]">Identified {insights?.recurring?.length || 0} active subscriptions totaling ₹{insights?.totalRecurring}/mo.</p>
               </div>
             </div>
             {insights?.recurring && insights.recurring.length > 0 && (
               <div className="mt-2 pl-14 pr-2">
-                <p className="text-xs font-semibold text-accentCyan/60 mb-2 uppercase tracking-wider">Active Subscriptions</p>
+                <p className="text-[10px] font-semibold text-[rgba(215,255,63,0.4)] mb-2 uppercase tracking-widest">Active Subscriptions</p>
                 <div className="space-y-2">
                   {insights.recurring.map((sub, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-sm bg-accentCyan/10 p-2 rounded-lg border border-accentCyan/10">
-                      <span className="text-cyan-50">{sub.service}</span>
-                      <span className="font-medium text-accentCyan">₹{sub.amount}/mo</span>
+                    <div key={idx} className="flex justify-between items-center text-xs bg-[rgba(215,255,63,0.05)] p-2.5 rounded-lg border border-[rgba(215,255,63,0.06)]">
+                      <span className="text-[rgba(255,255,255,0.7)]">{sub.service}</span>
+                      <span className="font-semibold text-[#D7FF3F]">₹{sub.amount}/mo</span>
                     </div>
                   ))}
                 </div>
@@ -225,9 +227,10 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Charts + Transactions Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="glass-panel p-6 lg:col-span-1 flex flex-col">
-          <h3 className="text-xl font-bold mb-6">Expense Breakdown</h3>
+          <h3 className="text-lg font-bold mb-5 font-outfit">Expense Breakdown</h3>
           <div className="flex-1 flex flex-col items-center justify-center min-h-[220px]">
             <div className="relative w-full h-[220px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -236,7 +239,7 @@ const DashboardOverview = () => {
                     {COLORS.map((color, index) => (
                       <linearGradient key={`grad-${index}`} id={`grad-${index}`} x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={color} stopOpacity={1} />
-                        <stop offset="95%" stopColor={color} stopOpacity={0.6} />
+                        <stop offset="95%" stopColor={color} stopOpacity={0.5} />
                       </linearGradient>
                     ))}
                   </defs>
@@ -259,20 +262,20 @@ const DashboardOverview = () => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="w-full mt-6 grid grid-cols-2 gap-x-4 gap-y-3 overflow-y-auto max-h-[140px] pr-1">
+            <div className="w-full mt-5 grid grid-cols-2 gap-x-4 gap-y-2.5 overflow-y-auto max-h-[140px] pr-1">
               {(() => {
                 const total = (dashboardData?.categoryBreakdown || []).reduce((sum, item) => sum + item.value, 0);
                 return (dashboardData?.categoryBreakdown || []).map((entry, index) => {
                   const percentage = total > 0 ? ((entry.value / total) * 100).toFixed(1) : 0;
                   return (
-                    <div key={entry.name} className="flex items-center justify-between text-sm">
+                    <div key={entry.name} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: COLORS[index % COLORS.length] }}></span>
-                        <span className="text-textSecondary truncate max-w-[90px]">{entry.name}</span>
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-[0_0_6px_currentColor]" style={{ background: COLORS[index % COLORS.length] }}></span>
+                        <span className="text-[rgba(255,255,255,0.5)] truncate max-w-[80px]">{entry.name}</span>
                       </div>
                       <div className="flex items-center gap-2 font-semibold">
-                        <span className="text-textSecondary text-xs">₹{entry.value.toLocaleString('en-IN')}</span>
-                        <span className="text-white text-xs">{percentage}%</span>
+                        <span className="text-[rgba(255,255,255,0.35)] text-[10px]">₹{entry.value.toLocaleString('en-IN')}</span>
+                        <span className="text-white text-[10px]">{percentage}%</span>
                       </div>
                     </div>
                   );
@@ -283,31 +286,31 @@ const DashboardOverview = () => {
         </div>
 
         <div className="glass-panel p-6 lg:col-span-2">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold">Recent Transactions</h3>
-            <button className="text-accentCyan text-sm font-medium flex items-center gap-1 hover:underline">
-              View All <ArrowRight size={14} />
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="text-lg font-bold font-outfit">Recent Transactions</h3>
+            <button className="text-[#D7FF3F] text-xs font-semibold flex items-center gap-1 hover:underline">
+              View All <ArrowRight size={13} />
             </button>
           </div>
-          <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2">
+          <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
             {transactions.map(tx => (
               <motion.div
                 whileHover={{ scale: 1.01, backgroundColor: 'rgba(255,255,255,0.03)' }}
                 key={tx.id}
-                className="flex items-center justify-between p-4 rounded-xl border border-glassBorder transition-colors"
+                className="flex items-center justify-between p-3.5 rounded-xl border border-[rgba(255,255,255,0.04)] transition-colors"
               >
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${tx.type === 'Expense' ? 'bg-accentPurple/20 text-accentPurple' : 'bg-accentGreen/20 text-accentGreen'}`}>
-                    {tx.type === 'Expense' ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
+                <div className="flex items-center gap-3.5">
+                  <div className={`p-2.5 rounded-xl ${tx.type === 'Expense' ? 'bg-[rgba(255,92,117,0.1)] text-[#FF5C75]' : 'bg-[rgba(166,255,77,0.1)] text-[#A6FF4D]'}`}>
+                    {tx.type === 'Expense' ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
                   </div>
                   <div>
-                    <div className="font-semibold text-white text-base">{tx.asset}</div>
-                    <div className="text-sm text-textSecondary">{tx.category} • {tx.date}</div>
+                    <div className="font-semibold text-white text-sm">{tx.asset}</div>
+                    <div className="text-xs text-[rgba(255,255,255,0.4)]">{tx.category} • {tx.date}</div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-white">₹{tx.value}</div>
-                  <div className={`text-xs px-2 py-1 rounded-md inline-block mt-1 ${tx.type === 'Expense' ? 'bg-slate-800 text-slate-300' : 'bg-accentGreen/20 text-accentGreen'}`}>
+                  <div className="font-bold text-white text-sm">₹{tx.value}</div>
+                  <div className={`text-[10px] px-2 py-0.5 rounded-md inline-block mt-1 ${tx.type === 'Expense' ? 'bg-[rgba(255,92,117,0.1)] text-[#FF5C75]' : 'bg-[rgba(166,255,77,0.1)] text-[#A6FF4D]'}`}>
                     {tx.type}
                   </div>
                 </div>
@@ -317,51 +320,53 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Monthly Trend and Top Merchants row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+      {/* Monthly Trend and Top Merchants */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         <div className="glass-panel p-6 lg:col-span-2">
-          <h3 className="text-xl font-bold mb-6">Income vs Expense Trend</h3>
+          <h3 className="text-lg font-bold mb-5 font-outfit">Income vs Expense Trend</h3>
           <div className="w-full overflow-x-auto">
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={280}>
               <BarChart
                 data={dashboardData?.monthlyTrend || []}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                margin={{ top: 15, right: 25, left: 15, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" />
-                <YAxis stroke="rgba(255,255,255,0.5)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                <XAxis dataKey="month" stroke="rgba(255,255,255,0.35)" tick={{ fontSize: 12 }} />
+                <YAxis stroke="rgba(255,255,255,0.35)" tick={{ fontSize: 12 }} />
                 <RechartsTooltip
                   contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    borderColor: 'rgba(0, 240, 255, 0.3)',
-                    borderRadius: '12px',
-                    color: '#fff'
+                    backgroundColor: 'rgba(21, 21, 24, 0.95)',
+                    borderColor: 'rgba(215, 255, 63, 0.15)',
+                    borderRadius: '14px',
+                    color: '#fff',
+                    backdropFilter: 'blur(18px)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
                   }}
                 />
-                <Legend wrapperStyle={{ color: '#fff' }} />
-                <Bar dataKey="income" name="Income" fill="#00ff88" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expense" name="Expense" fill="#ff5f56" radius={[4, 4, 0, 0]} />
+                <Legend wrapperStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px' }} />
+                <Bar dataKey="income" name="Income" fill="#A6FF4D" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="expense" name="Expense" fill="#FF5C75" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         <div className="glass-panel p-6 lg:col-span-1">
-          <h3 className="text-xl font-bold mb-6">Top Merchant Spending</h3>
-          <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+          <h3 className="text-lg font-bold mb-5 font-outfit">Top Merchant Spending</h3>
+          <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2">
             {(dashboardData?.merchantRankings || []).map((m, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-glassBorder">
+              <div key={idx} className="flex items-center justify-between p-3 rounded-xl border border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.03)] transition-colors">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold">
+                  <span className="w-6 h-6 rounded-lg bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] flex items-center justify-center text-[10px] font-bold">
                     {idx + 1}
                   </span>
-                  <span className="font-semibold text-white truncate max-w-[150px]">{m.merchant}</span>
+                  <span className="font-medium text-white text-sm truncate max-w-[130px]">{m.merchant}</span>
                 </div>
-                <span className="font-bold text-accentPurple">₹{m.amount.toLocaleString('en-IN')}</span>
+                <span className="font-bold text-[#FFB84D] text-sm">₹{m.amount.toLocaleString('en-IN')}</span>
               </div>
             ))}
             {(!dashboardData?.merchantRankings || dashboardData.merchantRankings.length === 0) && (
-              <div className="text-center text-textSecondary py-8 text-sm">
+              <div className="text-center text-[rgba(255,255,255,0.35)] py-8 text-xs">
                 No merchant spending data available
               </div>
             )}
@@ -374,7 +379,7 @@ const DashboardOverview = () => {
 
 const Dashboard = () => {
   return (
-    <div className="flex h-screen w-full bg-bgPrimary overflow-hidden">
+    <div className="flex h-screen w-full bg-[#0F0F11] overflow-hidden">
       <Sidebar />
       <Routes>
         <Route path="/" element={<DashboardOverview />} />

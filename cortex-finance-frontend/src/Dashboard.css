@@ -1,70 +1,8 @@
+/* Dashboard.css — merged into App.css glassmorphism theme */
+/* This file is kept minimal; all styles live in App.css now */
+
 .dashboard {
   padding: 20px;
-  background: #f4f6f8;
+  background: #0F0F11;
   min-height: 100vh;
-}
-
-/* TOP CARDS */
-.cards {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.card {
-  flex: 1;
-  padding: 20px;
-  border-radius: 12px;
-  color: white;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.blue { background: #2563eb; }
-.green { background: #16a34a; }
-.red { background: #dc2626; }
-
-/* PANELS */
-.panel {
-  background: white;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-/* MAIN SECTION */
-.main {
-  display: flex;
-  gap: 20px;
-}
-
-/* TRANSACTIONS */
-.transaction {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.category {
-  font-size: 12px;
-  background: #e5e7eb;
-  padding: 3px 8px;
-  border-radius: 8px;
-}
-
-/* ALERT */
-.alert {
-  margin-top: 10px;
-  padding: 10px;
-  background: #fee2e2;
-  color: #b91c1c;
-  border-radius: 8px;
-}
-
-/* FILE NAME */
-.fileName {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #555;
 }
