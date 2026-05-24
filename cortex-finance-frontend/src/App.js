@@ -38,7 +38,7 @@ const GuestRoute = ({ children }) => {
 };
 
 function App() {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode] = useState(true);
 
   return (
     <div className={darkMode ? "theme-dark" : "theme-light"}>
