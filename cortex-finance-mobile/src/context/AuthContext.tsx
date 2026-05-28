@@ -41,9 +41,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           try {
             console.log('loadStoredSession verifying token against backend...');
             const response = await apiClient.get<User>('/auth/me');
-            console.log('loadStoredSession verification success:', response.data);
-            setUser(response.data);
-            await storage.saveUser(response.data);
+            const fetchedUser = response.data;
+            if (fetchedUser && !fetchedUser.full_name && (fetchedUser as any).name) {
+              fetchedUser.full_name = (fetchedUser as any).name;
+            }
+            console.log('loadStoredSession verification success:', fetchedUser);
+            setUser(fetchedUser);
+            await storage.saveUser(fetchedUser);
           } catch (err) {
             console.warn('Session verification failed, logging out', err);
             await handleLogout();
@@ -69,13 +73,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
 
-      const { access_token, user: loggedUser } = response.data;
-      setToken(access_token);
-      setUser(loggedUser);
+      const tokenVal = response.data.token || response.data.access_token;
+      const loggedUser = response.data.user;
 
-      // Save to secure store
-      await storage.saveToken(access_token);
-      await storage.saveUser(loggedUser);
+      if (tokenVal && loggedUser) {
+        if (!loggedUser.full_name && (loggedUser as any).name) {
+          loggedUser.full_name = (loggedUser as any).name;
+        }
+        setToken(tokenVal);
+        setUser(loggedUser);
+
+        // Save to secure store
+        await storage.saveToken(tokenVal);
+        await storage.saveUser(loggedUser);
+      } else {
+        throw new Error('Authentication response is missing token or user data');
+      }
     } catch (err) {
       const axiosError = err as AxiosError<{ detail?: string }>;
       const message = axiosError.response?.data?.detail || 'Invalid email or password';
@@ -93,16 +106,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await apiClient.post<AuthResponse>('/auth/signup', {
         email,
         password,
-        full_name: fullName,
+        name: fullName,
       });
 
-      const { access_token, user: newUser } = response.data;
-      setToken(access_token);
-      setUser(newUser);
+      const tokenVal = response.data.token || response.data.access_token;
+      const newUser = response.data.user;
 
-      // Save to secure store
-      await storage.saveToken(access_token);
-      await storage.saveUser(newUser);
+      if (tokenVal && newUser) {
+        if (!newUser.full_name && (newUser as any).name) {
+          newUser.full_name = (newUser as any).name;
+        }
+        setToken(tokenVal);
+        setUser(newUser);
+
+        // Save to secure store
+        await storage.saveToken(tokenVal);
+        await storage.saveUser(newUser);
+      } else {
+        throw new Error('Registration response is missing token or user data');
+      }
     } catch (err) {
       const axiosError = err as AxiosError<{ detail?: string }>;
       const message = axiosError.response?.data?.detail || 'Registration failed';
