@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Server, Wifi, WifiOff, Database, Trash2, CheckCircle2, RefreshCw } from 'lucide-react';
+import api from '../api/mockService';
 
 const Settings = () => {
   const [apiMode, setApiMode] = useState(localStorage.getItem('cortex_api_mode') || 'live');
@@ -11,14 +12,18 @@ const Settings = () => {
   const checkBackendStatus = async () => {
     setBackendStatus('checking');
     try {
-      const res = await fetch('http://localhost:8000/dashboard');
-      if (res.ok || res.status === 404 || res.status === 422) {
+      const res = await api.get('/dashboard');
+      if (res.status === 200 || res.status === 404 || res.status === 422) {
         setBackendStatus('online');
       } else {
         setBackendStatus('offline');
       }
     } catch (e) {
-      setBackendStatus('offline');
+      if (e.response) {
+        setBackendStatus('online');
+      } else {
+        setBackendStatus('offline');
+      }
     }
   };
 
@@ -85,7 +90,7 @@ const Settings = () => {
           </div>
 
           <p className="text-[rgba(255,255,255,0.45)] text-sm leading-relaxed">
-            Choose whether the application should call your live local FastAPI server running on <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">http://localhost:8000</code> or use simulated mock data.
+            Choose whether the application should call your live FastAPI server running on <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">{api.defaults.baseURL || 'http://localhost:8000'}</code> or use simulated mock data.
           </p>
 
           <div className="space-y-3">
@@ -114,7 +119,7 @@ const Settings = () => {
             >
               <div>
                 <div className="font-medium text-sm">Live FastAPI Server</div>
-                <div className="text-[10px] text-[rgba(255,255,255,0.35)] mt-0.5">Query local API endpoints at http://localhost:8000</div>
+                <div className="text-[10px] text-[rgba(255,255,255,0.35)] mt-0.5">Query API endpoints at {api.defaults.baseURL || 'http://localhost:8000'}</div>
               </div>
               {apiMode === 'live' && <div className="w-2.5 h-2.5 rounded-full bg-[#D7FF3F] shadow-[0_0_8px_rgba(215,255,63,0.5)]"></div>}
             </button>
@@ -147,7 +152,7 @@ const Settings = () => {
             </div>
 
             <p className="text-[rgba(255,255,255,0.4)] text-sm leading-relaxed">
-              Ensure you have run the backend server using <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">uvicorn main:app --reload</code> inside the <code className="bg-[rgba(255,255,255,0.06)] px-2 py-1 rounded-lg text-[#D7FF3F] text-xs border border-[rgba(255,255,255,0.05)]">cortex-finance-backend</code> directory.
+              Ensure the backend server is running and accessible at the active URL endpoint configured in your environment or Settings.
             </p>
           </div>
 

@@ -1,8 +1,0 @@
-/* Dashboard.css — merged into App.css glassmorphism theme */
-/* This file is kept minimal; all styles live in App.css now */
-
-.dashboard {
-  padding: 20px;
-  background: #0F0F11;
-  min-height: 100vh;
-}

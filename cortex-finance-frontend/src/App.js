@@ -13,9 +13,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Upload from "./pages/Upload";
-import Processing from "./pages/Processing";
 import Dashboard from "./pages/Dashboard";
-import Chatbot from "./pages/Chatbot";
 
 /* CSS */
 import "./App.css";
@@ -77,30 +75,11 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          <Route
-            path="/processing"
-            element={
-              <ProtectedRoute>
-                <Processing />
-              </ProtectedRoute>
-            }
-          />
-
           <Route
             path="/dashboard/*"
             element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/chatbot"
-            element={
-              <ProtectedRoute>
-                <Chatbot />
               </ProtectedRoute>
             }
           />
