@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import psycopg2
+import psycopg2.pool
 from psycopg2.extras import RealDictCursor
 import app.utils.config  # Loads .env variables first
 
@@ -8,22 +9,76 @@ DATABASE_URL = os.getenv("DATABASE_URL", "")
 IS_POSTGRES = DATABASE_URL.startswith("postgres://") or DATABASE_URL.startswith("postgresql://")
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "cortex_finance.db")
 
+# Threaded connection pool for PostgreSQL
+pg_pool = None
+
+def init_pool():
+    global pg_pool
+    if IS_POSTGRES and not pg_pool:
+        try:
+            pg_pool = psycopg2.pool.ThreadedConnectionPool(5, 20, DATABASE_URL)
+        except Exception as e:
+            import logging
+            logging.getLogger("db").error(f"Failed to initialize PostgreSQL connection pool: {e}")
+
+class PoolConnectionWrapper:
+    def __init__(self, conn, pool):
+        self._conn = conn
+        self._pool = pool
+
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+
+    def cursor(self, *args, **kwargs):
+        return self._conn.cursor(*args, **kwargs)
+
+    def commit(self):
+        return self._conn.commit()
+
+    def rollback(self):
+        return self._conn.rollback()
+
+    def close(self):
+        if self._pool and self._conn:
+            try:
+                self._pool.putconn(self._conn)
+            except Exception:
+                try:
+                    self._conn.close()
+                except Exception:
+                    pass
+            self._conn = None
+            self._pool = None
+
 def get_db_connection():
     """Establishes and returns a database connection based on the configured engine."""
     if IS_POSTGRES:
-        # Standard connection to Postgres
-        conn = psycopg2.connect(DATABASE_URL)
-        return conn
+        if not pg_pool:
+            init_pool()
+        if pg_pool:
+            try:
+                conn = pg_pool.getconn()
+                return PoolConnectionWrapper(conn, pg_pool)
+            except Exception:
+                pass
+        return psycopg2.connect(DATABASE_URL)
     else:
-        # Fallback to SQLite
-        conn = sqlite3.connect(DB_PATH)
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
         conn.row_factory = sqlite3.Row
+        try:
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA synchronous=NORMAL;")
+            conn.execute("PRAGMA cache_size = -2000;")
+            conn.execute("PRAGMA temp_store = MEMORY;")
+        except Exception:
+            pass
         return conn
 
 def get_db_cursor(conn):
     """Returns a cursor that returns rows as dictionaries/dict-like objects."""
     if IS_POSTGRES:
-        return conn.cursor(cursor_factory=RealDictCursor)
+        real_conn = conn._conn if isinstance(conn, PoolConnectionWrapper) else conn
+        return real_conn.cursor(cursor_factory=RealDictCursor)
     else:
         return conn.cursor()
 
@@ -38,7 +93,6 @@ def init_db():
     conn = get_db_connection()
     cursor = get_db_cursor(conn)
     
-    # Create users table and transactions table
     if IS_POSTGRES:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -64,6 +118,20 @@ def init_db():
                 filename VARCHAR(255) NOT NULL
             )
         """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS recurring_patterns (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                narration TEXT NOT NULL,
+                frequency VARCHAR(50),
+                average_amount REAL,
+                occurrences INTEGER,
+                last_date VARCHAR(20),
+                is_fixed_amount INTEGER
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions (user_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_recurring_patterns_user_id ON recurring_patterns (user_id);")
     else:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -89,6 +157,20 @@ def init_db():
                 filename TEXT NOT NULL
             )
         """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS recurring_patterns (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                narration TEXT NOT NULL,
+                frequency TEXT,
+                average_amount REAL,
+                occurrences INTEGER,
+                last_date TEXT,
+                is_fixed_amount INTEGER
+            )
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions (user_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_recurring_patterns_user_id ON recurring_patterns (user_id);")
         
     conn.commit()
     conn.close()
@@ -97,8 +179,10 @@ def clear_db(user_id: int):
     """Deletes all transaction records belonging to a specific user."""
     conn = get_db_connection()
     cursor = get_db_cursor(conn)
-    query = format_query("DELETE FROM transactions WHERE user_id = ?")
-    cursor.execute(query, (user_id,))
+    query1 = format_query("DELETE FROM transactions WHERE user_id = ?")
+    cursor.execute(query1, (user_id,))
+    query2 = format_query("DELETE FROM recurring_patterns WHERE user_id = ?")
+    cursor.execute(query2, (user_id,))
     conn.commit()
     conn.close()
 
@@ -189,3 +273,54 @@ def get_user_by_id(user_id: int) -> dict | None:
     row = cursor.fetchone()
     conn.close()
     return dict(row) if row else None
+
+def save_recurring_patterns(patterns: list[dict], user_id: int):
+    """Bulk inserts recurring patterns mapped to a user_id."""
+    conn = get_db_connection()
+    cursor = get_db_cursor(conn)
+    
+    query = """
+        INSERT INTO recurring_patterns (user_id, narration, frequency, average_amount, occurrences, last_date, is_fixed_amount)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """
+    insert_query = format_query(query)
+    
+    data_to_insert = [
+        (
+            user_id,
+            p.get("narration"),
+            p.get("frequency"),
+            float(p.get("average_amount", 0.0) or 0.0),
+            int(p.get("occurrences", 0) or 0),
+            p.get("last_date"),
+            1 if p.get("is_fixed_amount") else 0
+        )
+        for p in patterns
+    ]
+    
+    cursor.executemany(insert_query, data_to_insert)
+    conn.commit()
+    conn.close()
+
+def get_recurring_patterns(user_id: int) -> list[dict]:
+    """Retrieves all recurring pattern records belonging to a specific user."""
+    init_db()
+    conn = get_db_connection()
+    cursor = get_db_cursor(conn)
+    query = format_query("SELECT * FROM recurring_patterns WHERE user_id = ?")
+    cursor.execute(query, (user_id,))
+    rows = cursor.fetchall()
+    
+    patterns = []
+    for row in rows:
+        r = dict(row)
+        patterns.append({
+            "narration": r.get("narration"),
+            "frequency": r.get("frequency"),
+            "average_amount": r.get("average_amount"),
+            "occurrences": r.get("occurrences"),
+            "last_date": r.get("last_date"),
+            "is_fixed_amount": bool(r.get("is_fixed_amount"))
+        })
+    conn.close()
+    return patterns

@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import ORJSONResponse
+from app.utils.rate_limiter import RedisRateLimitMiddleware
 
 from app.routes.upload import router as upload_router
 from app.routes.dashboard import router as dashboard_router
@@ -8,7 +11,10 @@ from app.routes.insights import router as insights_router
 from app.routes.auth import router as auth_router
 from app.database.db import init_db
 
-app = FastAPI(title="Cortex Finance AI")
+app = FastAPI(
+    title="Cortex Finance AI",
+    default_response_class=ORJSONResponse
+)
 
 # CORS
 app.add_middleware(
@@ -18,6 +24,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Compression & Rate Limiting Middlewares
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(RedisRateLimitMiddleware)
 
 @app.on_event("startup")
 def on_startup():

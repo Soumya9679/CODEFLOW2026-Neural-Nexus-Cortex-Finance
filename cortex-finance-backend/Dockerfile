@@ -27,5 +27,5 @@ COPY . .
 # Expose the port uvicorn will run on
 EXPOSE 8000
 
-# Run uvicorn server, binding to the dynamic PORT variable provided by Railway
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run uvicorn server or celery worker dynamically based on PROCESS_TYPE variable
+CMD ["sh", "-c", "if [ \"$PROCESS_TYPE\" = \"worker\" ]; then celery -A app.tasks.worker.celery_app worker --loglevel=info; else uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}; fi"]

@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: cortex-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  redis:
+    image: redis:alpine
+    container_name: cortex-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend-web:
+    build:
+      context: ./cortex-finance-backend
+      dockerfile: Dockerfile
+    container_name: cortex-backend-web
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - PROCESS_TYPE=web
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=sqlite:////app/cortex_finance.db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - HF_API_TOKEN=${HF_API_TOKEN}
+    depends_on:
+      - rabbitmq
+      - redis
+
+  backend-worker:
+    build:
+      context: ./cortex-finance-backend
+      dockerfile: Dockerfile
+    container_name: cortex-backend-worker
+    environment:
+      - PROCESS_TYPE=worker
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=sqlite:////app/cortex_finance.db
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - HF_API_TOKEN=${HF_API_TOKEN}
+    depends_on:
+      - rabbitmq
+      - redis
+
+volumes:
+  rabbitmq_data:
+  redis_data:

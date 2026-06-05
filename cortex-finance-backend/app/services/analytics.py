@@ -1,7 +1,5 @@
-from app.database.db import get_all_transactions
+from app.database.db import get_all_transactions, get_recurring_patterns
 from collections import defaultdict
-from app.services.anomaly_detector import detect_anomalies
-from app.services.recurring_detector import detect_recurring_payments
 
 def generate_dashboard_data(user_id: int) -> dict:
     """
@@ -122,11 +120,24 @@ def generate_dashboard_data(user_id: int) -> dict:
         for merchant, amount in sorted_merchants[:5]
     ]
 
-    # Run detectors
-    # Filter for debits only when detecting anomalies to focus on unusual expenses
-    debit_detector_txs = [t for t in detector_txs if t["type"] == "debit"]
-    anomalies = detect_anomalies(debit_detector_txs)
-    recurring_payments = detect_recurring_payments(detector_txs)
+    # Fetch anomalies directly from the loaded transactions
+    anomalies = []
+    for tx in transactions:
+        if tx.get("is_anomaly", 0) == 1:
+            debit = float(tx.get("debit", 0.0) or 0.0)
+            credit = float(tx.get("credit", 0.0) or 0.0)
+            anomalies.append({
+                "id": tx.get("id"),
+                "date": tx.get("date"),
+                "amount": debit if debit > 0 else credit,
+                "narration": tx.get("narration"),
+                "type": "debit" if debit > 0 else "credit",
+                "category": tx.get("category", "Others"),
+                "z_score": 2.5,
+                "anomaly_reason": f"Flagged as unusual transaction during statement analysis."
+            })
+
+    recurring_payments = get_recurring_patterns(user_id)
 
     return {
         "income": round(total_income, 2),

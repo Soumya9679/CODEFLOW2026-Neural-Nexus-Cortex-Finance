@@ -25,16 +25,22 @@ class HuggingFaceInferenceEmbeddings(Embeddings):
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         if not texts:
             return []
-        try:
-            res = self.client.feature_extraction(texts, model=self.model_name)
-            if hasattr(res, "tolist"):
-                return res.tolist()
-            if isinstance(res, list) and len(res) > 0 and not isinstance(res[0], list):
-                return [res]
-            return res
-        except Exception as e:
-            logger.error(f"Failed to fetch embeddings from HuggingFace Inference API: {e}")
-            raise e
+        
+        batch_size = 32
+        embeddings = []
+        for i in range(0, len(texts), batch_size):
+            chunk = texts[i:i+batch_size]
+            try:
+                res = self.client.feature_extraction(chunk, model=self.model_name)
+                if hasattr(res, "tolist"):
+                    res = res.tolist()
+                elif isinstance(res, list) and len(res) > 0 and not isinstance(res[0], list):
+                    res = [res]
+                embeddings.extend(res)
+            except Exception as e:
+                logger.error(f"Failed to fetch embeddings chunk {i}-{i+batch_size} from HuggingFace Inference API: {e}")
+                raise e
+        return embeddings
 
     def embed_query(self, text: str) -> list[float]:
         try:
