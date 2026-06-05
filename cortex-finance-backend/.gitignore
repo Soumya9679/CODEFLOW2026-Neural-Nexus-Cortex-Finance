@@ -48,4 +48,11 @@ tmp/
 # HuggingFace Cache
 .cache/
 
-.env.example
+# Python test/analysis caches
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local FAISS index stores
+app/rag/faiss_index*/
